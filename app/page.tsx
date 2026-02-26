@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button, Card } from "antd";
 import {
   ThunderboltOutlined,
@@ -10,9 +11,9 @@ import {
   CodeOutlined,
 } from "@ant-design/icons";
 
-import Navbar from "./components/Navbar";
-import HeroPreview from "./components/HeroPreview";
-import ProductPreview from "./components/ProductPreview";
+import HeroPreview from "@/components/HeroPreview";
+import ProductPreview from "@/components/ProductPreview";
+import AuthModal from "@/components/AuthModal";
 
 const features = [
   { title: "Structured Q&A", desc: "Ask technical questions with tags.", icon: CompassOutlined },
@@ -24,6 +25,8 @@ const features = [
 ];
 
 export default function Home() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   return (
     <main className="relative starry min-h-screen px-2 py-4">
       {/* glow blobs */}
@@ -47,7 +50,12 @@ export default function Home() {
             </p>
 
             <div className="mt-6 flex gap-3">
-              <Button className="btn-gradient" type="primary" size="large">
+              <Button
+                className="btn-gradient"
+                type="primary"
+                size="large"
+                onClick={() => setIsAuthModalOpen(true)}
+              >
                 Get Started
               </Button>
               <Button size="large" className="!bg-white/5 !text-white !border-white/10 hover:!border-white/20">
@@ -139,12 +147,22 @@ export default function Home() {
             Ready to join the developer knowledge network?
           </div>
           <div className="mt-6">
-            <Button className="btn-gradient" type="primary" size="large">
+            <Button
+              className="btn-gradient"
+              type="primary"
+              size="large"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
               Start Asking Questions
             </Button>
           </div>
         </section>
       </div>
+
+      <AuthModal
+        open={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </main>
   );
 }
