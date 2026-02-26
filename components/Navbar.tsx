@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { logout } from "@/store/auth/authSlice";
+import { logoutUser } from "@/store/auth/authThunks";
 import AuthModal from "./AuthModal";
 
 export default function Navbar() {
@@ -17,7 +17,7 @@ export default function Navbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     router.push("/");
   };
 

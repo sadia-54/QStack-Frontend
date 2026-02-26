@@ -8,13 +8,30 @@ interface AuthState {
   error: string | null;
 }
 
-const initialState: AuthState = {
-  accessToken: null,
-  refreshToken: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
+const getInitialState = () => {
+  if (typeof window === "undefined") {
+    return {
+      accessToken: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    };
+  }
+
+  const accessToken = localStorage.getItem("access_token");
+  const refreshToken = localStorage.getItem("refresh_token");
+
+  return {
+    accessToken: accessToken || null,
+    refreshToken: refreshToken || null,
+    isAuthenticated: !!accessToken && !!refreshToken,
+    isLoading: false,
+    error: null,
+  };
 };
+
+const initialState: AuthState = getInitialState();
 
 const authSlice = createSlice({
   name: "auth",

@@ -12,7 +12,8 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { RootState, AppDispatch } from "@/store";
-import { logout } from "@/store/auth/authSlice";
+import { logoutUser } from "@/store/auth/authThunks";
+import AuthGuard from "@/components/AuthGuard";
 
 const popularTags = [
   { name: "javascript", count: 1234 },
@@ -64,11 +65,12 @@ export default function Dashboard() {
   const { accessToken } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     router.push("/");
   };
 
   return (
+    <AuthGuard>
     <div className="relative starry min-h-screen px-4 py-6">
       {/* glow blobs */}
       <div className="glow -top-60 -left-60 bg-purple-900/40" />
@@ -249,5 +251,6 @@ export default function Dashboard() {
         </section>
       </div>
     </div>
+    </AuthGuard>
   );
 }
