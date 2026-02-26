@@ -1,10 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthResponse } from "@/types/auth";
 
-const initialState: AuthResponse = {
-  access_token: "",
-  refresh_token: "",
-  token_type: "",
+interface AuthState {
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+}
+
+const initialState: AuthState = {
+  accessToken: null,
+  refreshToken: null,
+  isAuthenticated: false,
 };
 
 const authSlice = createSlice({
@@ -15,14 +20,14 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ accessToken: string; refreshToken: string }>
     ) => {
-      state.access_token = action.payload.accessToken;
-      state.refresh_token = action.payload.refreshToken;
-      state.token_type = "Bearer";
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.isAuthenticated = true;
     },
     logout: (state) => {
-      state.access_token = "";
-      state.refresh_token = "";
-      state.token_type = "";
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.isAuthenticated = false;
     },
   },
 });
