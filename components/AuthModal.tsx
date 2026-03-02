@@ -47,6 +47,8 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           refreshToken: response.refresh_token,
         })
       );
+      localStorage.setItem("access_token", response.access_token);
+      localStorage.setItem("refresh_token", response.refresh_token);
       message.success("Login successful!");
       signInForm.resetFields();
       onClose();

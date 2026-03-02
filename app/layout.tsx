@@ -19,6 +19,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "QStack",
   description: "Modern Developer Q&A Platform",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -25,7 +25,7 @@ const getInitialState = () => {
   return {
     accessToken: accessToken || null,
     refreshToken: refreshToken || null,
-    isAuthenticated: !!accessToken && !!refreshToken,
+    isAuthenticated: !!accessToken,
     isLoading: false,
     error: null,
   };
