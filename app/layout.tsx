@@ -4,6 +4,7 @@ import "./globals.css";
 import "antd/dist/reset.css";
 import Providers from "@/components/AppProviders";
 import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,10 +30,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-           <Navbar />
-            <main className="px-6 py-8">
-          {children}
-        </main>
+          <Navbar />
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1 ml-64 pt-24 pr-6 pb-8">
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>

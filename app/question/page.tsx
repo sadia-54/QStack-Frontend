@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Tag, Button } from "antd";
+import { Card, Tag, Button, Pagination } from "antd";
 import {
   ThunderboltOutlined,
   MessageOutlined,
@@ -21,12 +21,24 @@ export default function QuestionFeed() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const sortedQuestions = [...questions].sort(
     (a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
+
+  const totalPages = Math.ceil(sortedQuestions.length / pageSize);
+  const paginatedQuestions = sortedQuestions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -107,7 +119,7 @@ export default function QuestionFeed() {
         </header>
 
         <div className="space-y-4">
-          {sortedQuestions.map((q) => (
+          {paginatedQuestions.map((q) => (
             <Card
               key={q.id}
               className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
@@ -154,11 +166,25 @@ export default function QuestionFeed() {
           ))}
         </div>
 
-        {sortedQuestions.length === 0 && (
+        {paginatedQuestions.length === 0 && (
           <div className="glass !rounded-2xl !text-white p-8 text-center">
             <div className="text-gray-200/60 text-lg">
               No questions yet. Be the first to ask!
             </div>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <Pagination
+              current={currentPage}
+              total={sortedQuestions.length}
+              pageSize={pageSize}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+              showLessItems
+            />
           </div>
         )}
       </div>

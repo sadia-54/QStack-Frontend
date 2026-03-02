@@ -91,12 +91,6 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-4">
             <Button
-              className="!bg-white/5 !text-white !border-white/10 hover:!border-purple-400/30"
-              onClick={() => router.push("/")}
-            >
-              Home
-            </Button>
-            <Button
               className="btn-gradient"
               icon={<LogoutOutlined />}
               onClick={handleLogout}

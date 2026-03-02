@@ -74,3 +74,37 @@ body {
 .q-card .ant-card-body {
   padding: 20px !important;
 }
+
+/* Sidebar menu styles */
+.sidebar-menu .ant-menu-item {
+  margin: 8px 0 !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.sidebar-menu .ant-menu-item:hover {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(88, 13, 149, 0.4) 0%, rgba(67, 35, 164, 0.4) 50%, rgba(53, 6, 161, 0.4) 100%) !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.sidebar-menu .ant-menu-item-selected .anticon {
+  color: #a855f7 !important;
+}
+
+.sidebar-menu .ant-menu-item .anticon {
+  color: #c4b5fd !important;
+  transition: color 0.3s ease !important;
+}
+
+.sidebar-menu .ant-menu-item:hover .anticon {
+  color: #a855f7 !important;
+}
+
+.sidebar-menu .ant-menu-title-content {
+  color: #e9d5ff !important;
+  font-size: 18px !important;
+}

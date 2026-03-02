@@ -26,8 +26,8 @@ export default function Navbar() {
   };
 
   return (
-    <header className="relative z-10">
-     <div className="h-20 glass !border-0 backdrop-blur-xl rounded mx-auto max-w-[100%] px-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50">
+     <div className="h-20 glass !border-0 backdrop-blur-xl rounded mx-auto max-w-[100%] px-16 pl-5 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
         <Image
