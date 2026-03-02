@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, Tag, Button } from "antd";
 import {
   ThunderboltOutlined,
@@ -16,6 +17,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
 export default function QuestionFeed() {
+  const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,6 +66,10 @@ export default function QuestionFeed() {
     setIsModalOpen(true);
   };
 
+  const handleQuestionClick = (id: number) => {
+    router.push(`/question/${id}`);
+  };
+
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
@@ -105,6 +111,7 @@ export default function QuestionFeed() {
             <Card
               key={q.id}
               className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
+              onClick={() => handleQuestionClick(q.id)}
             >
               <div className="flex items-start gap-4">
                 <div className="flex flex-col items-center gap-1 min-w-[60px]">

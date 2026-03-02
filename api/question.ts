@@ -14,6 +14,18 @@ export const getQuestionFeed = async () => {
   return res.json();
 };
 
+export const getQuestionById = async (id: number) => {
+  const res = await fetch(`${BASE_URL}/questions/${id}`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch question");
+  }
+
+  return res.json();
+};
+
 export const createQuestion = async (
   payload: CreateQuestionRequest,
   accessToken: string
