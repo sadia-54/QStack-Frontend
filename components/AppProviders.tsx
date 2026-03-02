@@ -3,6 +3,7 @@
 import { ConfigProvider, theme } from "antd";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/store";
+import AuthInitializer from "@/components/AuthInitializer";
 
 export default function Providers({
   children,
@@ -11,6 +12,7 @@ export default function Providers({
 }) {
   return (
     <ReduxProvider store={store}>
+      <AuthInitializer />
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
