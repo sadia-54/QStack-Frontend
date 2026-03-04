@@ -1,9 +1,28 @@
-import { CreateQuestionRequest } from "../types/question";
+import { CreateQuestionRequest, FeedQueryParams } from "../types/question";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const getQuestionFeed = async () => {
-  const res = await fetch(`${BASE_URL}/questions`, {
+const buildQueryString = (params: FeedQueryParams): string => {
+  const searchParams = new URLSearchParams();
+
+  if (params.search) searchParams.append("search", params.search);
+  if (params.tag) searchParams.append("tag", params.tag);
+  if (params.sort) {
+    // Map frontend sort options to backend expected values
+    const sortValue = params.sort === "oldest" ? "date" : params.sort;
+    searchParams.append("sort", sortValue);
+  }
+  if (params.limit) searchParams.append("limit", params.limit.toString());
+  if (params.offset) searchParams.append("offset", params.offset.toString());
+
+  return searchParams.toString();
+};
+
+export const getQuestionFeed = async (params?: FeedQueryParams) => {
+  const queryString = params ? buildQueryString(params) : "";
+  const url = `${BASE_URL}/questions${queryString ? `?${queryString}` : ""}`;
+
+  const res = await fetch(url, {
     method: "GET",
   });
 

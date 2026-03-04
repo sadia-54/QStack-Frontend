@@ -18,3 +18,18 @@ export interface CreateQuestionRequest {
   description: string;
   tags: string[];
 }
+
+export type SortOption = "newest" | "oldest" | "votes";
+
+export interface FeedQueryParams {
+  search?: string;
+  tag?: string;
+  sort?: SortOption;
+  limit?: number;
+  offset?: number;
+}
+
+export interface FeedResponse {
+  questions: Question[];
+  total: number;
+}

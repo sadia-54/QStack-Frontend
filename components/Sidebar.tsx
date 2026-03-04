@@ -14,6 +14,11 @@ export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Hide sidebar on landing page
+  if (pathname === "/") {
+    return null;
+  }
+
   const menuItems = [
     {
       key: "/dashboard",

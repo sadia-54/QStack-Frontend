@@ -35,8 +35,9 @@ export default function Navbar() {
             alt="QStack Logo"
             width={200}
             height={80}
-            className="h-full w-auto object-contain"
+            className="h-full w-auto object-contain cursor-pointer"
             priority
+            onClick={() => router.push("/")}
         />
         </div>
 

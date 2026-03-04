@@ -108,3 +108,26 @@ body {
   color: #e9d5ff !important;
   font-size: 18px !important;
 }
+
+/* Filter toolbar select styles */
+.filter-select .ant-select-selector {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+  color: white !important;
+}
+
+.filter-select .ant-select-selector:hover {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+.filter-select .ant-select-arrow {
+  color: rgba(139, 92, 246, 0.8) !important;
+}
+
+.filter-select .ant-select-placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.filter-select .ant-select-selection-item {
+  color: white !important;
+}

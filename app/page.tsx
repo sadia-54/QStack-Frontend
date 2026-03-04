@@ -14,6 +14,7 @@ import {
 import HeroPreview from "@/components/HeroPreview";
 import ProductPreview from "@/components/ProductPreview";
 import AuthModal from "@/components/AuthModal";
+import { useRouter } from "next/navigation";
 
 const features = [
   { title: "Structured Q&A", desc: "Ask technical questions with tags.", icon: CompassOutlined },
@@ -26,6 +27,7 @@ const features = [
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <main className="relative starry min-h-screen px-2 py-4">
@@ -58,7 +60,7 @@ export default function Home() {
               >
                 Get Started
               </Button>
-              <Button size="large" className="!bg-white/5 !text-white !border-white/10 hover:!border-white/20">
+              <Button size="large" className="!bg-white/5 !text-white !border-white/10 hover:!border-white/20" onClick={() => router.push("/question")}>
                 Explore Questions
               </Button>
             </div>
