@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Tag, Button, Pagination, Spin } from "antd";
 import {
   ThunderboltOutlined,
@@ -22,6 +22,7 @@ const DEBOUNCE_DELAY = 500; // ms
 
 export default function QuestionFeed() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -32,6 +33,31 @@ export default function QuestionFeed() {
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
+
+  // Initialize filters from URL query params on mount
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    const urlTag = searchParams.get("tag");
+    const urlSort = searchParams.get("sort") as SortOption | null;
+
+    if (urlSearch) setSearch(urlSearch);
+    if (urlTag) setTag(urlTag);
+    if (urlSort && ["newest", "oldest", "votes"].includes(urlSort)) {
+      setSort(urlSort);
+    }
+  }, [searchParams]);
+
+  // Update URL query params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (tag) params.set("tag", tag);
+    if (sort !== "newest") params.set("sort", sort);
+
+    const queryString = params.toString();
+    const newPath = queryString ? `/question?${queryString}` : "/question";
+    router.replace(newPath, { scroll: false });
+  }, [search, tag, sort]);
 
   const hasActiveFilters = search !== "" || tag !== "" || sort !== "newest";
 
