@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { logoutUser } from "@/store/auth/authThunks";
@@ -12,9 +12,12 @@ import AuthModal from "./AuthModal";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const isLandingPage = pathname === "/";
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -42,11 +45,13 @@ export default function Navbar() {
         </div>
 
         {/* Links */}
-        <nav className="hidden md:flex items-center gap-8 text-base text-gray-200/90">
-          <a className="hover:text-white transition" href="#features">Features</a>
-          <a className="hover:text-white transition" href="#how">How It Works</a>
-          <a className="hover:text-white transition" href="#community">Community</a>
-        </nav>
+        {isLandingPage && (
+          <nav className="hidden md:flex items-center gap-8 text-base text-gray-200/90">
+            <a className="hover:text-white transition" href="#features">Features</a>
+            <a className="hover:text-white transition" href="#how">How It Works</a>
+            <a className="hover:text-white transition" href="#community">Community</a>
+          </nav>
+        )}
 
         {/* CTA */}
         {isAuthenticated ? (
