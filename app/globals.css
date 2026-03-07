@@ -131,3 +131,49 @@ body {
 .filter-select .ant-select-selection-item {
   color: white !important;
 }
+
+/* For editor codeblocks */
+.ProseMirror {
+  outline: none;
+  min-height: 280px;
+  font-size: 20px;
+  line-height: 1.7;
+  color: #e5e7eb;
+}
+
+.ProseMirror p {
+  margin: 8px 0;
+}
+
+.ProseMirror h2 {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.ProseMirror pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 14px;
+  border-radius: 10px;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.ProseMirror code {
+  font-family: monospace;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 24px;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 24px;
+}
+
+.ProseMirror li {
+  margin: 4px 0;
+}

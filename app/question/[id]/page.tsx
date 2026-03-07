@@ -152,9 +152,10 @@ export default function QuestionDetail() {
                 ))}
               </div>
 
-              <div className="text-gray-200/80 whitespace-pre-wrap leading-relaxed text-base break-words">
-                {question.description}
-              </div>
+              <div
+                className="ProseMirror text-gray-200 max-w-none"
+                dangerouslySetInnerHTML={{ __html: question.description }}
+              />
             </div>
           </div>
         </Card>
