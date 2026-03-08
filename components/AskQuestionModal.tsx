@@ -37,6 +37,13 @@ export default function AskQuestionModal({
       return;
     }
 
+    // Transform tags string to array (form provides string, API expects array)
+    const tagsInput = (values as any).tags as string;
+    const tagsArray = tagsInput
+      .split(/[,\s]+/)
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag.length > 0);
+
     setLoading(true);
 
     try {
@@ -44,6 +51,7 @@ export default function AskQuestionModal({
         {
           ...values,
           description,
+          tags: tagsArray,
         },
         accessToken
       );
@@ -140,17 +148,20 @@ export default function AskQuestionModal({
         <Form.Item
           label={<span className="text-gray-200/80">Tags</span>}
           name="tags"
-          rules={[{ required: true, message: "Please enter at least one tag" }]}
-          getValueFromEvent={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            return value
-              .split(",")
-              .map((tag: string) => tag.trim())
-              .filter((tag: string) => tag.length > 0);
-          }}
+          rules={[
+            { required: true, message: "Please enter at least one tag" },
+            {
+              validator: (_, value) => {
+                if (!value || value.trim() === "") {
+                  return Promise.reject("Please enter at least one tag");
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
         >
           <Input
-            placeholder="e.g., javascript, react, nextjs (comma separated)"
+            placeholder="e.g., javascript react nextjs (comma or space separated)"
             size="large"
             className="!bg-white/5 !border-purple-400/20 !text-white hover:!border-purple-400/40 focus:!border-purple-400/60"
             styles={{

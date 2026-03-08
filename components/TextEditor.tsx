@@ -22,6 +22,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       }),
       CodeBlockLowlight.configure({
         lowlight,
+        defaultLanguage: "javascript",
       }),
     ],
     content: value,
