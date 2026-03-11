@@ -73,7 +73,19 @@ export default function QuestionDetail() {
   const fetchAnswers = async () => {
     try {
       const data = await getAnswersByQuestion(questionId);
-      setAnswers(data || []);
+      const fetchedAnswers = data || [];
+      
+      // Sort answers: accepted first, then newest first
+      const sortedAnswers = [...fetchedAnswers].sort((a, b) => {
+        // Accepted answer always first
+        if (a.is_accepted && !b.is_accepted) return -1;
+        if (!a.is_accepted && b.is_accepted) return 1;
+        
+        // For non-accepted (or both accepted), sort by newest first
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+      
+      setAnswers(sortedAnswers);
     } catch (error) {
       console.error("Failed to fetch answers:", error);
       setAnswers([]);
