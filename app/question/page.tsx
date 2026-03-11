@@ -2,18 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, Tag, Button, Pagination, Spin } from "antd";
+import { Card, Tag, Button, Pagination, Spin, App } from "antd";
 import {
   ThunderboltOutlined,
   MessageOutlined,
   UserOutlined,
   ClockCircleOutlined,
   PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
-import { getQuestionFeed } from "@/api/question";
-import { Question, SortOption, FeedQueryParams } from "@/types/question";
+import { getQuestionFeed, updateQuestion, deleteQuestion } from "@/api/question";
+import { Question, SortOption, FeedQueryParams, CreateQuestionRequest } from "@/types/question";
 import AskQuestionModal from "@/components/AskQuestionModal";
 import FilterToolbar from "@/components/FilterToolbar";
+import EditQuestionModal from "@/components/EditQuestionModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
@@ -23,12 +26,15 @@ const DEBOUNCE_DELAY = 500; // ms
 export default function QuestionFeed() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { message } = App.useApp();
+  const { isAuthenticated, currentUserId, accessToken } = useSelector((state: RootState) => state.auth);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState("");
@@ -150,6 +156,37 @@ export default function QuestionFeed() {
     router.push(`/question/${id}`);
   };
 
+  const handleEditQuestion = (question: Question) => {
+    setEditingQuestion(question);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
+    if (!editingQuestion || !accessToken) return;
+
+    try {
+      await updateQuestion(editingQuestion.id, data, accessToken);
+      message.success("Question updated successfully!");
+      setIsEditModalOpen(false);
+      setEditingQuestion(null);
+      await fetchQuestions();
+    } catch (error: any) {
+      message.error(error.message || "Failed to update question");
+    }
+  };
+
+  const handleDeleteQuestion = async (id: number) => {
+    if (!accessToken) return;
+
+    try {
+      await deleteQuestion(id, accessToken);
+      message.success("Question deleted successfully!");
+      await fetchQuestions();
+    } catch (error: any) {
+      message.error(error.message || "Failed to delete question");
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
@@ -205,51 +242,77 @@ export default function QuestionFeed() {
         />
 
         <div className="space-y-4">
-          {paginatedQuestions.map((q) => (
-            <Card
-              key={q.id}
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
-              onClick={() => handleQuestionClick(q.id)}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                  <div className="text-sm text-gray-200/60 flex items-center gap-1">
-                    <ThunderboltOutlined className="text-yellow-400" />
-                    {q.vote_count}
+          {paginatedQuestions.map((q) => {
+            const isOwner = currentUserId ? q.author.id === Number(currentUserId) : false;
+
+            return (
+              <Card
+                key={q.id}
+                className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
+                onClick={() => handleQuestionClick(q.id)}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex flex-col items-center gap-1 min-w-[60px]">
+                    <div className="text-sm text-gray-200/60 flex items-center gap-1">
+                      <ThunderboltOutlined className="text-yellow-400" />
+                      {q.vote_count}
+                    </div>
+                    <div className="text-sm text-gray-200/60 flex items-center gap-1">
+                      <MessageOutlined />
+                      {q.answer_count}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-200/60 flex items-center gap-1">
-                    <MessageOutlined />
-                    {q.answer_count}
+
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-medium text-purple-200 hover:text-white transition flex-1">
+                        {q.title}
+                      </h3>
+                      {isOwner && (
+                        <div className="flex gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <Button
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditQuestion(q)}
+                            className="!bg-purple-500/20 !border-purple-400/30 !text-purple-200 hover:!bg-purple-500/30"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            className="!bg-red-500/20 !border-red-400/30 !text-red-200 hover:!bg-red-500/30"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-200/60">
+                      <UserOutlined className="text-purple-300" />
+                      <span>{q.author.username}</span>
+                      <span className="text-gray-200/30">•</span>
+                      <ClockCircleOutlined className="text-purple-300" />
+                      <span>{formatDate(q.created_at)}</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {q.tags.map((tagItem) => (
+                        <Tag
+                          key={tagItem}
+                          className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
+                        >
+                          {tagItem}
+                        </Tag>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-purple-200 hover:text-white transition">
-                    {q.title}
-                  </h3>
-
-                  <div className="flex items-center gap-2 mt-2 text-sm text-gray-200/60">
-                    <UserOutlined className="text-purple-300" />
-                    <span>{q.author.username}</span>
-                    <span className="text-gray-200/30">•</span>
-                    <ClockCircleOutlined className="text-purple-300" />
-                    <span>{formatDate(q.created_at)}</span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {q.tags.map((tagItem) => (
-                      <Tag
-                        key={tagItem}
-                        className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
-                      >
-                        {tagItem}
-                      </Tag>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
 
         {paginatedQuestions.length === 0 && !loading && (
@@ -280,6 +343,16 @@ export default function QuestionFeed() {
       <AskQuestionModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchQuestions}
+      />
+
+      <EditQuestionModal
+        question={editingQuestion}
+        open={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingQuestion(null);
+        }}
         onSuccess={fetchQuestions}
       />
     </div>

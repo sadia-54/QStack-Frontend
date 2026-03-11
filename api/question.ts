@@ -66,3 +66,43 @@ export const createQuestion = async (
 
   return data;
 };
+
+export const updateQuestion = async (
+  id: number,
+  payload: CreateQuestionRequest,
+  accessToken: string
+) => {
+  const res = await fetch(`${BASE_URL}/questions/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to update question");
+  }
+
+  return data;
+};
+
+export const deleteQuestion = async (id: number, accessToken: string) => {
+  const res = await fetch(`${BASE_URL}/questions/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to delete question");
+  }
+
+  return data;
+};

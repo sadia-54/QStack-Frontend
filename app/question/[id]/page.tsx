@@ -9,8 +9,10 @@ import {
   UserOutlined,
   ClockCircleOutlined,
   ArrowLeftOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
-import { getQuestionById } from "@/api/question";
+import { getQuestionById, updateQuestion, deleteQuestion } from "@/api/question";
 import { Question } from "@/types/question";
 import { Answer } from "@/types/answer";
 import {
@@ -25,6 +27,7 @@ import { RootState } from "@/store";
 import AnswerCard from "@/components/AnswerCard";
 import AnswerForm from "@/components/AnswerForm";
 import EditAnswerModal from "@/components/EditAnswerModal";
+import EditQuestionModal from "@/components/EditQuestionModal";
 
 export default function QuestionDetail() {
   const params = useParams();
@@ -40,6 +43,8 @@ export default function QuestionDetail() {
   const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [isEditQuestionModalOpen, setIsEditQuestionModalOpen] = useState(false);
+  const [updatingQuestion, setUpdatingQuestion] = useState(false);
 
   const questionId = params.id ? parseInt(params.id as string) : 0;
 
@@ -169,6 +174,38 @@ export default function QuestionDetail() {
     setIsEditModalOpen(true);
   };
 
+  const handleEditQuestionClick = () => {
+    setIsEditQuestionModalOpen(true);
+  };
+
+  const handleUpdateQuestion = async (data: any) => {
+    if (!question || !accessToken) return;
+
+    setUpdatingQuestion(true);
+    try {
+      await updateQuestion(question.id, data, accessToken);
+      message.success("Question updated successfully!");
+      setIsEditQuestionModalOpen(false);
+      await fetchQuestion();
+    } catch (error: any) {
+      message.error(error.message || "Failed to update question");
+    } finally {
+      setUpdatingQuestion(false);
+    }
+  };
+
+  const handleDeleteQuestion = async () => {
+    if (!question || !accessToken) return;
+
+    try {
+      await deleteQuestion(question.id, accessToken);
+      message.success("Question deleted successfully!");
+      router.push("/question");
+    } catch (error: any) {
+      message.error(error.message || "Failed to delete question");
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
@@ -241,9 +278,31 @@ export default function QuestionDetail() {
             </div>
 
             <div className="flex-1 p-6 min-w-0">
-              <h1 className="text-2xl font-semibold text-white mb-4 break-words">
-                {question.title}
-              </h1>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-2xl font-semibold text-white break-words flex-1">
+                  {question.title}
+                </h1>
+                {isQuestionOwner && (
+                  <div className="flex gap-2 flex-shrink-0">
+                    <Button
+                      size="small"
+                      icon={<EditOutlined />}
+                      onClick={handleEditQuestionClick}
+                      className="!bg-purple-500/20 !border-purple-400/30 !text-purple-200 hover:!bg-purple-500/30"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={handleDeleteQuestion}
+                      className="!bg-red-500/20 !border-red-400/30 !text-red-200 hover:!bg-red-500/30"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-3 text-sm text-gray-200/60 mb-4 pb-4 border-b border-purple-500/10">
                 <div className="flex items-center gap-2">
@@ -343,6 +402,16 @@ export default function QuestionDetail() {
         }}
         onSubmit={handleUpdateAnswer}
         isSubmitting={updating}
+      />
+
+      {/* Edit Question Modal */}
+      <EditQuestionModal
+        question={question}
+        open={isEditQuestionModalOpen}
+        onClose={() => {
+          setIsEditQuestionModalOpen(false);
+        }}
+        onSuccess={fetchQuestion}
       />
     </div>
   );
