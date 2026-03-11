@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme, App } from "antd";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/store";
 import AuthInitializer from "@/components/AuthInitializer";
@@ -22,7 +22,9 @@ export default function Providers({
           },
         }}
       >
-        {children}
+        <App>
+          {children}
+        </App>
       </ConfigProvider>
     </ReduxProvider>
   );

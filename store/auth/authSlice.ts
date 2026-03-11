@@ -6,6 +6,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  currentUserId: number | null;
 }
 
 const initialState: AuthState = {
@@ -14,6 +15,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  currentUserId: null,
 };
 
 const authSlice = createSlice({
@@ -26,11 +28,12 @@ const authSlice = createSlice({
     },
     loginSuccess: (
       state,
-      action: PayloadAction<{ accessToken: string; refreshToken: string }>
+      action: PayloadAction<{ accessToken: string; refreshToken: string; userId?: number }>
     ) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
+      state.currentUserId = action.payload.userId ?? null;
       state.isLoading = false;
       state.error = null;
     },
@@ -54,11 +57,15 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+      state.currentUserId = null;
       state.isLoading = false;
       state.error = null;
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setCurrentUserId: (state, action: PayloadAction<number>) => {
+      state.currentUserId = action.payload;
     },
   },
 });
@@ -72,5 +79,6 @@ export const {
   signupFailure,
   logout,
   clearError,
+  setCurrentUserId,
 } = authSlice.actions;
 export default authSlice.reducer;

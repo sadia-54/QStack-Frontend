@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, Tag, Button } from "antd";
+import { Card, Tag, Button, App } from "antd";
 import {
   ThunderboltOutlined,
   MessageOutlined,
@@ -12,12 +12,36 @@ import {
 } from "@ant-design/icons";
 import { getQuestionById } from "@/api/question";
 import { Question } from "@/types/question";
+import { Answer } from "@/types/answer";
+import {
+  getAnswersByQuestion,
+  createAnswer,
+  updateAnswer,
+  deleteAnswer,
+  acceptAnswer,
+} from "@/api/answer";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import AnswerCard from "@/components/AnswerCard";
+import AnswerForm from "@/components/AnswerForm";
+import EditAnswerModal from "@/components/EditAnswerModal";
 
 export default function QuestionDetail() {
   const params = useParams();
   const router = useRouter();
+  const { message } = App.useApp();
+  const { isAuthenticated, accessToken, currentUserId } = useSelector(
+    (state: RootState) => state.auth
+  );
   const [question, setQuestion] = useState<Question | null>(null);
+  const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  const questionId = params.id ? parseInt(params.id as string) : 0;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -34,23 +58,104 @@ export default function QuestionDetail() {
     return date.toLocaleDateString();
   };
 
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const id = parseInt(params.id as string);
-        const data = await getQuestionById(id);
-        setQuestion(data);
-      } catch (error) {
-        console.error("Failed to fetch question:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const currentUserIdNum = currentUserId ? Number(currentUserId) : null;
+  const isQuestionOwner = question && currentUserIdNum ? question.author.id === currentUserIdNum : false;
 
-    if (params.id) {
-      fetchQuestion();
+  const fetchQuestion = async () => {
+    try {
+      const data = await getQuestionById(questionId);
+      setQuestion(data);
+    } catch (error) {
+      console.error("Failed to fetch question:", error);
     }
-  }, [params.id]);
+  };
+
+  const fetchAnswers = async () => {
+    try {
+      const data = await getAnswersByQuestion(questionId);
+      setAnswers(data || []);
+    } catch (error) {
+      console.error("Failed to fetch answers:", error);
+      setAnswers([]);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!questionId) return;
+      setLoading(true);
+      await Promise.all([fetchQuestion(), fetchAnswers()]);
+      setLoading(false);
+    };
+    fetchData();
+  }, [questionId]);
+
+  const handleCreateAnswer = async (description: string) => {
+    if (!accessToken) {
+      message.error("Please login to post an answer");
+      router.push("/");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createAnswer(questionId, { description }, accessToken);
+      message.success("Answer posted successfully!");
+      await fetchAnswers();
+      await fetchQuestion();
+    } catch (error: any) {
+      message.error(error.message || "Failed to post answer");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUpdateAnswer = async (description: string) => {
+    if (!editingAnswer || !accessToken) return;
+
+    setUpdating(true);
+    try {
+      await updateAnswer(editingAnswer.id, { description }, accessToken);
+      message.success("Answer updated successfully!");
+      setIsEditModalOpen(false);
+      setEditingAnswer(null);
+      await fetchAnswers();
+    } catch (error: any) {
+      message.error(error.message || "Failed to update answer");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteAnswer = async (answerId: number) => {
+    if (!accessToken) return;
+
+    try {
+      await deleteAnswer(answerId, accessToken);
+      message.success("Answer deleted successfully!");
+      await fetchAnswers();
+      await fetchQuestion();
+    } catch (error: any) {
+      message.error(error.message || "Failed to delete answer");
+    }
+  };
+
+  const handleAcceptAnswer = async (answerId: number) => {
+    if (!accessToken) return;
+
+    try {
+      await acceptAnswer(answerId, accessToken);
+      message.success("Answer accepted!");
+      await fetchAnswers();
+    } catch (error: any) {
+      message.error(error.message || "Failed to accept answer");
+    }
+  };
+
+  const handleEditClick = (answer: Answer) => {
+    setEditingAnswer(answer);
+    setIsEditModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -99,9 +204,10 @@ export default function QuestionDetail() {
           Back to Feed
         </Button>
 
+        {/* Question Card */}
         <Card
-          className="glass !rounded-2xl !text-white !border-0"
-          bodyStyle={{ padding: 0 }}
+          className="glass !rounded-2xl !text-white !border-0 mb-6"
+          styles={{ body: { padding: 0 } }}
         >
           <div className="flex">
             <div className="w-[80px] bg-purple-900/20 flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
@@ -142,14 +248,16 @@ export default function QuestionDetail() {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {question.tags.map((tag) => (
-                  <Tag
-                    key={tag}
-                    className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200 !text-sm !px-3 !py-1"
-                  >
-                    {tag}
-                  </Tag>
-                ))}
+                {question.tags && question.tags.length > 0 ? (
+                  question.tags.map((tag) => (
+                    <Tag
+                      key={tag}
+                      className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200 !text-sm !px-3 !py-1"
+                    >
+                      {tag}
+                    </Tag>
+                  ))
+                ) : null}
               </div>
 
               <div
@@ -159,7 +267,71 @@ export default function QuestionDetail() {
             </div>
           </div>
         </Card>
+
+        {/* Answers Section */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-white mb-4">
+            {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
+          </h2>
+
+          {/* Answer List */}
+          {answers.length > 0 ? (
+            <div className="space-y-4 mb-6">
+              {answers.map((answer) => (
+                <AnswerCard
+                  key={answer.id}
+                  answer={answer}
+                  isQuestionOwner={isQuestionOwner}
+                  isAnswerOwner={currentUserIdNum ? answer.author.id === currentUserIdNum : false}
+                  onAccept={handleAcceptAnswer}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteAnswer}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="glass !rounded-2xl !text-white p-8 text-center mb-6">
+              <div className="text-gray-200/60 text-lg">
+                No answers yet. Be the first to answer!
+              </div>
+            </Card>
+          )}
+        </div>
+
+        {/* Answer Form */}
+        {isAuthenticated ? (
+          <AnswerForm
+            questionId={questionId}
+            onSubmit={handleCreateAnswer}
+            isSubmitting={submitting}
+          />
+        ) : (
+          <Card className="glass !rounded-2xl !text-white p-8 text-center">
+            <div className="text-gray-200/60 mb-4">
+              Please log in to post an answer
+            </div>
+            <Button
+              type="primary"
+              onClick={() => router.push("/")}
+              className="btn-gradient"
+            >
+              Log In
+            </Button>
+          </Card>
+        )}
       </div>
+
+      {/* Edit Answer Modal */}
+      <EditAnswerModal
+        answer={editingAnswer}
+        open={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingAnswer(null);
+        }}
+        onSubmit={handleUpdateAnswer}
+        isSubmitting={updating}
+      />
     </div>
   );
 }
