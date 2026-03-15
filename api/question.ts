@@ -1,4 +1,4 @@
-import { CreateQuestionRequest, FeedQueryParams } from "../types/question";
+import { CreateQuestionRequest, FeedQueryParams, VoteQuestionRequest } from "../types/question";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -102,6 +102,29 @@ export const deleteQuestion = async (id: number, accessToken: string) => {
 
   if (!res.ok) {
     throw new Error(data.error || "Failed to delete question");
+  }
+
+  return data;
+};
+
+export const voteQuestion = async (
+  id: number,
+  payload: VoteQuestionRequest,
+  accessToken: string
+) => {
+  const res = await fetch(`${BASE_URL}/questions/${id}/vote`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to vote");
   }
 
   return data;

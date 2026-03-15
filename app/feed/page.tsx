@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Tag, Button, Input } from "antd";
 import {
-  ThunderboltOutlined,
   MessageOutlined,
+  ThunderboltOutlined,
   UserOutlined,
   ClockCircleOutlined,
   SearchOutlined,
   FireOutlined,
+  UpOutlined,
 } from "@ant-design/icons";
 import { getQuestionFeed } from "@/api/question";
 import { Question } from "@/types/question";
@@ -153,7 +154,7 @@ export default function Feed() {
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center gap-1 min-w-[60px]">
                     <div className="text-sm text-gray-200/60 flex items-center gap-1">
-                      <ThunderboltOutlined className="text-yellow-400" />
+                      <UpOutlined className="text-yellow-400" />
                       {q.vote_count}
                     </div>
                     <div className="text-sm text-gray-200/60 flex items-center gap-1">

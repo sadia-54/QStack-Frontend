@@ -33,3 +33,7 @@ export interface FeedResponse {
   questions: Question[];
   total: number;
 }
+
+export interface VoteQuestionRequest {
+  value: 1 | -1;
+}

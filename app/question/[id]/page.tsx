@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, Tag, Button, App } from "antd";
 import {
-  ThunderboltOutlined,
   MessageOutlined,
   UserOutlined,
   ClockCircleOutlined,
   ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
+  UpOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
-import { getQuestionById, updateQuestion, deleteQuestion } from "@/api/question";
+import { getQuestionById, updateQuestion, deleteQuestion, voteQuestion } from "@/api/question";
 import { Question } from "@/types/question";
 import { Answer } from "@/types/answer";
 import {
@@ -22,21 +23,29 @@ import {
   deleteAnswer,
   acceptAnswer,
 } from "@/api/answer";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { setVote, removeVote } from "@/store/question/questionVoteSlice";
 import AnswerCard from "@/components/AnswerCard";
 import AnswerForm from "@/components/AnswerForm";
 import EditAnswerModal from "@/components/EditAnswerModal";
 import EditQuestionModal from "@/components/EditQuestionModal";
 
+function useQuestionState() {
+  const [question, setQuestion] = useState<Question | null>(null);
+  return { question, setQuestion };
+}
+
 export default function QuestionDetail() {
   const params = useParams();
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { message } = App.useApp();
   const { isAuthenticated, accessToken, currentUserId } = useSelector(
     (state: RootState) => state.auth
   );
-  const [question, setQuestion] = useState<Question | null>(null);
+  const { userVotes } = useSelector((state: RootState) => state.questionVote);
+  const { question, setQuestion } = useQuestionState();
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -47,6 +56,8 @@ export default function QuestionDetail() {
   const [updatingQuestion, setUpdatingQuestion] = useState(false);
 
   const questionId = params.id ? parseInt(params.id as string) : 0;
+
+  const userVote = question ? userVotes[question.id] : undefined;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -206,6 +217,39 @@ export default function QuestionDetail() {
     }
   };
 
+  const handleVote = async (value: 1 | -1) => {
+    if (!question || !accessToken) {
+      message.error("Please login to vote");
+      router.push("/");
+      return;
+    }
+
+    if (question.author.id === currentUserIdNum) {
+      message.error("You cannot vote on your own question");
+      return;
+    }
+
+    try {
+      await voteQuestion(question.id, { value }, accessToken);
+      
+      // Update local vote state
+      if (userVote === value) {
+        // Removing vote (same vote clicked again)
+        dispatch(removeVote({ questionId: question.id }));
+        setQuestion({ ...question, vote_count: question.vote_count - value });
+      } else {
+        // New vote or changing vote
+        const voteDiff = value - (userVote || 0);
+        dispatch(setVote({ questionId: question.id, value }));
+        setQuestion({ ...question, vote_count: question.vote_count + voteDiff });
+      }
+      
+      message.success("Vote recorded!");
+    } catch (error: any) {
+      message.error(error.message || "Failed to vote");
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
@@ -260,11 +304,28 @@ export default function QuestionDetail() {
         >
           <div className="flex">
             <div className="w-[80px] bg-purple-900/20 flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
-              <div className="flex flex-col items-center">
-                <ThunderboltOutlined className="text-yellow-400 text-2xl mb-1" />
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  type="text"
+                  size="large"
+                  icon={<UpOutlined className={`text-2xl ${userVote === 1 ? 'text-green-400' : 'text-gray-200/60 hover:text-green-400'}`} />}
+                  onClick={() => handleVote(1)}
+                  disabled={!isAuthenticated}
+                  className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  title={isAuthenticated ? "Upvote" : "Login to vote"}
+                />
                 <span className="text-2xl font-bold text-white">
                   {question.vote_count}
                 </span>
+                <Button
+                  type="text"
+                  size="large"
+                  icon={<DownOutlined className={`text-2xl ${userVote === -1 ? 'text-red-400' : 'text-gray-200/60 hover:text-red-400'}`} />}
+                  onClick={() => handleVote(-1)}
+                  disabled={!isAuthenticated}
+                  className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  title={isAuthenticated ? "Downvote" : "Login to vote"}
+                />
                 <span className="text-xs text-gray-200/60 uppercase tracking-wide">votes</span>
               </div>
               <div className="w-8 h-px bg-purple-500/30" />
