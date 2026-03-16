@@ -129,3 +129,31 @@ export const voteQuestion = async (
 
   return data;
 };
+
+export const getMyFeed = async (
+  params?: { limit?: number; offset?: number },
+  accessToken?: string | null
+) => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.limit) searchParams.append("limit", params.limit.toString());
+  if (params?.offset) searchParams.append("offset", params.offset.toString());
+
+  const queryString = searchParams.toString();
+  const url = `${BASE_URL}/questions/my-feed${queryString ? `?${queryString}` : ""}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: accessToken
+      ? {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      : undefined,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch my feed");
+  }
+
+  return res.json();
+};

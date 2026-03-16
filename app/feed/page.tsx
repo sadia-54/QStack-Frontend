@@ -12,20 +12,22 @@ import {
   FireOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { getQuestionFeed } from "@/api/question";
 import { Question } from "@/types/question";
 import AskQuestionModal from "@/components/AskQuestionModal";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
+import { fetchMyFeed, clearFeed } from "@/store/question/questionFeedSlice";
 
 export default function Feed() {
   const router = useRouter();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const { questions, isLoading, hasMore } = useSelector(
+    (state: RootState) => state.questionFeed
+  );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredQuestions = questions.filter((q) =>
     q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,20 +49,14 @@ export default function Feed() {
     return date.toLocaleDateString();
   };
 
-  const fetchQuestions = async () => {
-    try {
-      const data = await getQuestionFeed();
-      setQuestions(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchQuestions = () => {
+    dispatch(clearFeed());
+    dispatch(fetchMyFeed({ limit: 20, offset: 0 }));
   };
 
   useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, [dispatch]);
 
   const handleOpenModal = () => {
     if (!isAuthenticated) {
@@ -74,7 +70,7 @@ export default function Feed() {
     router.push(`/question/${id}`);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AuthGuard>
         <div className="relative starry min-h-screen px-4 py-6">
@@ -192,11 +188,14 @@ export default function Feed() {
             ))}
           </div>
 
-          {filteredQuestions.length === 0 && (
+          {filteredQuestions.length === 0 && !isLoading && (
             <div className="glass !rounded-2xl !text-white p-8 text-center">
               <div className="text-gray-200/60 text-lg">
                 {searchTerm ? "No questions match your search" : "No questions in your feed yet"}
               </div>
+              <p className="text-sm text-gray-200/40 mt-2">
+                {searchTerm ? "Try a different search term" : "Start asking questions or voting on tags to build your feed"}
+              </p>
             </div>
           )}
         </div>
