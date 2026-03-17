@@ -7,3 +7,13 @@ export interface User {
   bio?: string;
   reputation?: number;
 }
+
+export interface Profile {
+  id: number;
+  username: string;
+  bio: string;
+  total_questions: number;
+  total_answers: number;
+  total_votes: number;
+  preferred_tags?: string[];
+}
