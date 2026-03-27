@@ -3,6 +3,7 @@
 import { Input, Select, Button } from "antd";
 import { SearchOutlined, FilterOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import { SortOption } from "@/types/question";
+import { PREDEFINED_TAGS } from "@/utils/tags";
 
 const { Option } = Select;
 
@@ -49,23 +50,35 @@ export default function FilterToolbar({
           />
         </div>
 
-        {/* Tag Input */}
+        {/* Tag Select with predefined tags + custom input */}
         <div className="w-[180px]">
-          <Input
+          <Select
             placeholder="Filter by tag..."
             prefix={<FilterOutlined className="text-purple-300" />}
-            value={tag || undefined}
-            onChange={(e) => onTagChange(e.target.value)}
+            value={tag ? [tag] : []}
+            onChange={(value) => onTagChange(value[0] || "")}
             allowClear
+            showSearch
             size="large"
-            className="!bg-white/5 !border-purple-400/20 !text-white hover:!border-purple-400/40 focus:!border-purple-400/60"
-            styles={{
-              input: {
-                color: "white",
-                ["::placeholder" as any]: { color: "rgba(255,255,255,0.4)" },
-              },
+            mode="tags"
+            maxCount={1}
+            className="filter-select"
+            style={{ width: "100%" }}
+            popupStyle={{
+              background: "rgba(17, 22, 44, 0.95)",
+              borderColor: "rgba(139, 92, 246, 0.3)",
             }}
-          />
+            filterOption={(input, option) => {
+              const children = option?.children;
+              return String(children ?? "").toLowerCase().includes(input.toLowerCase());
+            }}
+          >
+            {PREDEFINED_TAGS.map((tagItem) => (
+              <Option key={tagItem} value={tagItem}>
+                {tagItem}
+              </Option>
+            ))}
+          </Select>
         </div>
 
         {/* Sort Dropdown */}
