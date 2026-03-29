@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { createLowlight } from "lowlight";
 import { useEffect } from "react";
+import Image from "@tiptap/extension-image";
 
 interface Props {
   value: string;
@@ -24,6 +25,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         lowlight,
         defaultLanguage: "javascript",
       }),
+      Image,
     ],
     content: value,
     immediatelyRender: false,
@@ -31,6 +33,34 @@ export default function RichTextEditor({ value, onChange }: Props) {
       onChange(editor.getHTML());
     },
   });
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      editor?.chain().focus().setImage({ src: data.url }).run();
+
+      event.target.value = ""; // reset input
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
@@ -93,6 +123,16 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           1. List
         </button>
+
+        <label className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition cursor-pointer">
+          Image
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            hidden
+          />
+        </label>
 
       </div>
 
