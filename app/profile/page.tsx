@@ -69,7 +69,7 @@ export default function ProfilePage() {
       <AuthGuard>
         <div className="relative starry min-h-screen px-4 py-6">
           <div className="flex items-center justify-center h-full">
-            <p className="text-white/60">Loading profile...</p>
+            <p className="text-text-muted">Loading profile...</p>
           </div>
         </div>
       </AuthGuard>
@@ -79,28 +79,28 @@ export default function ProfilePage() {
   return (
     <AuthGuard>
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1200px]">
           {/* Profile Header */}
-          <Card className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition mb-6">
+          <Card className="bg-surface !rounded-2xl !text-white hover:!border-accent transition mb-6">
             <div className="flex items-center gap-6">
               <Avatar
                 size={80}
                 icon={<UserOutlined />}
-                className="!bg-purple-500/20 !border-2 !border-purple-400/30"
+                className="!bg-hover-bg !border-2 !border-primary/30"
               />
               <div className="flex-1">
-                <h1 className="text-2xl font-semibold text-white">
+                <h1 className="text-2xl font-semibold text-text-primary">
                   {profile?.username || "User"}
                 </h1>
-                <p className="text-sm text-gray-200/60 flex items-center gap-2 mt-1">
+                <p className="text-sm text-text-muted flex items-center gap-2 mt-1">
                   <MailOutlined />
                   {profile?.username ? `${profile.username}@qstack.com` : "user@example.com"}
                 </p>
                 {profile?.bio && (
-                  <p className="text-sm text-gray-200/80 mt-2">{profile.bio}</p>
+                  <p className="text-sm text-text-secondary mt-2">{profile.bio}</p>
                 )}
               </div>
               <Button
@@ -116,63 +116,63 @@ export default function ProfilePage() {
           {/* Stats */}
           <div className="grid md:grid-cols-4 gap-6">
             <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
+              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
             >
               <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-yellow-400 mb-3">
+                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-warning mb-3">
                   <StarOutlined className="text-2xl" />
                 </div>
-                <div className="text-3xl font-semibold text-white">
+                <div className="text-3xl font-semibold text-text-primary">
                   {profile?.total_votes || 0}
                 </div>
-                <div className="text-sm text-gray-200/60 mt-1">Reputation</div>
+                <div className="text-sm text-text-muted mt-1">Reputation</div>
               </div>
             </Card>
 
             <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
+              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
             >
               <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-blue-400 mb-3">
+                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-primary mb-3">
                   <ThunderboltOutlined className="text-2xl" />
                 </div>
-                <div className="text-3xl font-semibold text-white">
+                <div className="text-3xl font-semibold text-text-primary">
                   {profile?.total_questions || 0}
                 </div>
-                <div className="text-sm text-gray-200/60 mt-1">Questions</div>
+                <div className="text-sm text-text-muted mt-1">Questions</div>
               </div>
             </Card>
 
             <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
+              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
             >
               <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-green-400 mb-3">
+                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-success mb-3">
                   <MessageOutlined className="text-2xl" />
                 </div>
-                <div className="text-3xl font-semibold text-white">
+                <div className="text-3xl font-semibold text-text-primary">
                   {profile?.total_answers || 0}
                 </div>
-                <div className="text-sm text-gray-200/60 mt-1">Answers</div>
+                <div className="text-sm text-text-muted mt-1">Answers</div>
               </div>
             </Card>
 
             {/* Preferred Tags */}
-            <Card className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition">
-              <h3 className="text-lg font-semibold mb-4">Preferred Tags</h3>
+            <Card className="bg-surface !rounded-2xl !text-white hover:!border-primary transition">
+              <h3 className="text-lg font-semibold mb-4 text-text-primary">Preferred Tags</h3>
               {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {profile.preferred_tags.map((tag) => (
                     <Tag
                       key={tag}
-                      className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
+                      className="!bg-hover-bg !border-border-soft !text-text-secondary"
                     >
                       {tag}
                     </Tag>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-200/60">No preferred tags set</p>
+                <p className="text-sm text-text-muted">No preferred tags set</p>
               )}
             </Card>
           </div>
@@ -186,7 +186,7 @@ export default function ProfilePage() {
           onCancel={handleCancel}
           className="glass-modal"
           footer={[
-            <Button key="cancel" onClick={handleCancel} className="!text-gray-300">
+            <Button key="cancel" onClick={handleCancel} className="!text-text-secondary">
               Cancel
             </Button>,
             <Button
@@ -202,12 +202,12 @@ export default function ProfilePage() {
         >
           <Space direction="vertical" className="w-full mt-4">
             <div>
-              <label className="text-white/80 text-sm mb-2 block">Bio</label>
+              <label className="text-text-secondary text-sm mb-2 block">Bio</label>
               <TextArea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
-                className="!bg-white/5 !text-white !border-white/10"
+                className="!bg-surface !text-text-primary !border hover:!border-accent focus:!border-accent"
                 placeholder="Tell us about yourself..."
               />
             </div>

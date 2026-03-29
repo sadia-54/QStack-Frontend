@@ -90,17 +90,17 @@ export default function QuestionDetail() {
     try {
       const data = await getAnswersByQuestion(questionId);
       const fetchedAnswers = data || [];
-      
+
       // Sort answers: accepted first, then newest first
       const sortedAnswers = [...fetchedAnswers].sort((a, b) => {
         // Accepted answer always first
         if (a.is_accepted && !b.is_accepted) return -1;
         if (!a.is_accepted && b.is_accepted) return 1;
-        
+
         // For non-accepted (or both accepted), sort by newest first
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-      
+
       setAnswers(sortedAnswers);
     } catch (error) {
       console.error("Failed to fetch answers:", error);
@@ -231,7 +231,7 @@ export default function QuestionDetail() {
 
     try {
       await voteQuestion(question.id, { value }, accessToken);
-      
+
       // Update local vote state
       if (userVote === value) {
         // Removing vote (same vote clicked again)
@@ -243,7 +243,7 @@ export default function QuestionDetail() {
         dispatch(setVote({ questionId: question.id, value }));
         setQuestion({ ...question, vote_count: question.vote_count + voteDiff });
       }
-      
+
       message.success("Vote recorded!");
     } catch (error: any) {
       message.error(error.message || "Failed to vote");
@@ -253,10 +253,10 @@ export default function QuestionDetail() {
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
         <div className="relative z-10 mx-auto max-w-[1100px] flex items-center justify-center min-h-[60vh]">
-          <div className="text-gray-200/60 text-lg">Loading question...</div>
+          <div className="text-text-muted text-lg">Loading question...</div>
         </div>
       </div>
     );
@@ -265,18 +265,18 @@ export default function QuestionDetail() {
   if (!question) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
         <div className="relative z-10 mx-auto max-w-[1100px]">
           <Button
             icon={<ArrowLeftOutlined />}
             onClick={() => router.push("/question")}
-            className="mb-4 !bg-purple-500/20 !border-purple-400/20 !text-purple-200 hover:!bg-purple-500/30"
+            className="mb-4 !bg-selected-bg !border-border !text-text-primary hover:!bg-hover-bg"
           >
             Back to Feed
           </Button>
-          <Card className="glass !rounded-2xl !text-white p-8 text-center">
-            <div className="text-gray-200/60 text-lg">Question not found</div>
+          <Card className="bg-surface !rounded-2xl !text-white p-8 text-center">
+            <div className="text-text-muted text-lg">Question not found</div>
           </Card>
         </div>
       </div>
@@ -285,62 +285,62 @@ export default function QuestionDetail() {
 
   return (
     <div className="relative starry min-h-screen px-4 py-6">
-      <div className="glow -top-60 -left-60 bg-purple-900/40" />
-      <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+      <div className="glow -top-60 -left-60 bg-primary/20" />
+      <div className="glow -bottom-60 -right-60 bg-primary/10" />
 
       <div className="relative z-10 mx-auto max-w-[900px]">
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => router.push("/question")}
-          className="mb-6 !bg-purple-500/20 !border-purple-400/20 !text-purple-200 hover:!bg-purple-500/30"
+          className="mb-6 !bg-selected-bg !border-border !text-text-primary hover:!bg-hover-bg"
         >
           Back to Feed
         </Button>
 
         {/* Question Card */}
         <Card
-          className="glass !rounded-2xl !text-white !border-0 mb-6"
+          className="bg-surface !rounded-2xl !text-white !border-0 mb-6"
           styles={{ body: { padding: 0 } }}
         >
           <div className="flex">
-            <div className="w-[80px] bg-purple-900/20 flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
+            <div className="w-[80px] bg-hover-bg flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
               <div className="flex flex-col items-center gap-2">
                 <Button
                   type="text"
                   size="large"
-                  icon={<UpOutlined className={`text-2xl ${userVote === 1 ? 'text-green-400' : 'text-gray-200/60 hover:text-green-400'}`} />}
+                  icon={<UpOutlined className={`text-2xl ${userVote === 1 ? 'text-success' : 'text-text-muted hover:text-success'}`} />}
                   onClick={() => handleVote(1)}
                   disabled={!isAuthenticated}
                   className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   title={isAuthenticated ? "Upvote" : "Login to vote"}
                 />
-                <span className="text-2xl font-bold text-white">
+                <span className="text-2xl font-bold text-text-primary">
                   {question.vote_count}
                 </span>
                 <Button
                   type="text"
                   size="large"
-                  icon={<DownOutlined className={`text-2xl ${userVote === -1 ? 'text-red-400' : 'text-gray-200/60 hover:text-red-400'}`} />}
+                  icon={<DownOutlined className={`text-2xl ${userVote === -1 ? 'text-error' : 'text-text-muted hover:text-error'}`} />}
                   onClick={() => handleVote(-1)}
                   disabled={!isAuthenticated}
                   className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   title={isAuthenticated ? "Downvote" : "Login to vote"}
                 />
-                <span className="text-xs text-gray-200/60 uppercase tracking-wide">votes</span>
+                <span className="text-xs text-text-muted uppercase tracking-wide">votes</span>
               </div>
-              <div className="w-8 h-px bg-purple-500/30" />
+              <div className="w-8 h-px bg-border" />
               <div className="flex flex-col items-center">
-                <MessageOutlined className="text-purple-300 text-2xl mb-1" />
-                <span className="text-2xl font-bold text-white">
+                <MessageOutlined className="text-primary text-2xl mb-1" />
+                <span className="text-2xl font-bold text-text-primary">
                   {question.answer_count}
                 </span>
-                <span className="text-xs text-gray-200/60 uppercase tracking-wide">answers</span>
+                <span className="text-xs text-text-muted uppercase tracking-wide">answers</span>
               </div>
             </div>
 
             <div className="flex-1 p-6 min-w-0">
               <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-2xl font-semibold text-white break-words flex-1">
+                <h1 className="text-2xl font-semibold text-text-primary break-words flex-1">
                   {question.title}
                 </h1>
                 {isQuestionOwner && (
@@ -349,7 +349,7 @@ export default function QuestionDetail() {
                       size="small"
                       icon={<EditOutlined />}
                       onClick={handleEditQuestionClick}
-                      className="!bg-purple-500/20 !border-purple-400/30 !text-purple-200 hover:!bg-purple-500/30"
+                      className="!bg-selected-bg !border-primary/30 !text-text-primary hover:!bg-hover-bg"
                     >
                       Edit
                     </Button>
@@ -357,7 +357,7 @@ export default function QuestionDetail() {
                       size="small"
                       icon={<DeleteOutlined />}
                       onClick={handleDeleteQuestion}
-                      className="!bg-red-500/20 !border-red-400/30 !text-red-200 hover:!bg-red-500/30"
+                      className="!bg-error/20 !border-error/30 !text-text-primary hover:!bg-error/30"
                     >
                       Delete
                     </Button>
@@ -365,16 +365,16 @@ export default function QuestionDetail() {
                 )}
               </div>
 
-              <div className="flex items-center gap-3 text-sm text-gray-200/60 mb-4 pb-4 border-b border-purple-500/10">
+              <div className="flex items-center gap-3 text-sm text-text-muted mb-4 pb-4 border-b border-border-soft">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center flex-shrink-0">
-                    <UserOutlined className="text-purple-300 text-xs" />
+                  <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
+                    <UserOutlined className="text-primary text-xs" />
                   </div>
                   <span>{question.author.username}</span>
                 </div>
-                <span className="text-gray-200/30">•</span>
+                <span className="text-text-muted">•</span>
                 <div className="flex items-center gap-2">
-                  <ClockCircleOutlined className="text-purple-300" />
+                  <ClockCircleOutlined className="text-primary" />
                   <span>asked {formatDate(question.created_at)}</span>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function QuestionDetail() {
                   question.tags.map((tag) => (
                     <Tag
                       key={tag}
-                      className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200 !text-sm !px-3 !py-1"
+                      className="!bg-hover-bg !border-border-soft !text-text-secondary !text-sm !px-3 !py-1"
                     >
                       {tag}
                     </Tag>
@@ -393,7 +393,7 @@ export default function QuestionDetail() {
               </div>
 
               <div
-                className="ProseMirror text-gray-200 max-w-none"
+                className="ProseMirror text-text-secondary max-w-none"
                 dangerouslySetInnerHTML={{ __html: question.description }}
               />
             </div>
@@ -402,7 +402,7 @@ export default function QuestionDetail() {
 
         {/* Answers Section */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">
+          <h2 className="text-xl font-semibold text-text-primary mb-4">
             {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
           </h2>
 
@@ -422,8 +422,8 @@ export default function QuestionDetail() {
               ))}
             </div>
           ) : (
-            <Card className="glass !rounded-2xl !text-white p-8 text-center mb-6">
-              <div className="text-gray-200/60 text-lg">
+            <Card className="bg-surface !rounded-2xl !text-white p-8 text-center mb-6">
+              <div className="text-text-muted text-lg">
                 No answers yet. Be the first to answer!
               </div>
             </Card>
@@ -438,8 +438,8 @@ export default function QuestionDetail() {
             isSubmitting={submitting}
           />
         ) : (
-          <Card className="glass !rounded-2xl !text-white p-8 text-center">
-            <div className="text-gray-200/60 mb-4">
+          <Card className="bg-surface !rounded-2xl !text-white p-8 text-center">
+            <div className="text-text-muted mb-4">
               Please log in to post an answer
             </div>
             <Button

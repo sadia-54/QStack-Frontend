@@ -74,10 +74,10 @@ export default function Feed() {
     return (
       <AuthGuard>
         <div className="relative starry min-h-screen px-4 py-6">
-          <div className="glow -top-60 -left-60 bg-purple-900/40" />
-          <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+          <div className="glow -top-60 -left-60 bg-accent/20" />
+          <div className="glow -bottom-60 -right-60 bg-accent/10" />
           <div className="relative z-10 mx-auto max-w-[1200px] flex items-center justify-center min-h-[60vh]">
-            <div className="text-gray-200/60 text-lg">Loading feed...</div>
+            <div className="text-text-muted text-lg">Loading feed...</div>
           </div>
         </div>
       </AuthGuard>
@@ -87,15 +87,15 @@ export default function Feed() {
   return (
     <AuthGuard>
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1200px]">
           {/* Header */}
-          <div className="glass !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8 flex items-center justify-between">
+          <div className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-white">My Feed</h1>
-              <p className="text-sm text-gray-200/60 mt-1">
+              <h1 className="text-2xl font-semibold text-text-primary">My Feed</h1>
+              <p className="text-sm text-text-muted mt-1">
                 Personalized questions based on your interests
               </p>
             </div>
@@ -114,9 +114,9 @@ export default function Feed() {
           <div className="mb-6">
             <Input
               placeholder="Search questions or tags..."
-              prefix={<SearchOutlined className="text-purple-300" />}
+              prefix={<SearchOutlined className="text-primary" />}
               size="large"
-              className="!bg-white/5 !border-purple-400/20 !text-white placeholder:text-gray-200/40"
+              className="!bg-surface !border hover:!border-accent focus:!border-accent placeholder:text-text-muted"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -124,13 +124,13 @@ export default function Feed() {
 
           {/* Trending Tags */}
           <div className="mb-6 flex items-center gap-2">
-            <FireOutlined className="text-orange-400" />
-            <span className="text-gray-200/60 text-sm">Trending:</span>
+            <FireOutlined className="text-warning" />
+            <span className="text-text-muted text-sm">Trending:</span>
             <div className="flex flex-wrap gap-2">
               {["javascript", "react", "typescript", "nodejs", "python"].map((tag) => (
                 <Tag
                   key={tag}
-                  className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200 cursor-pointer hover:!border-purple-400/40 transition"
+                  className="!bg-hover-bg !border-border-soft !text-text-secondary cursor-pointer hover:!border-accent transition"
                   onClick={() => setSearchTerm(tag)}
                 >
                   {tag}
@@ -144,31 +144,31 @@ export default function Feed() {
             {filteredQuestions.map((q) => (
               <Card
                 key={q.id}
-                className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
+                className="bg-surface !rounded-2xl !text-white hover:!border-accent transition cursor-pointer"
                 onClick={() => handleQuestionClick(q.id)}
               >
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                    <div className="text-sm text-gray-200/60 flex items-center gap-1">
-                      <UpOutlined className="text-yellow-400" />
+                    <div className="text-sm text-text-muted flex items-center gap-1">
+                      <UpOutlined className="text-warning" />
                       {q.vote_count}
                     </div>
-                    <div className="text-sm text-gray-200/60 flex items-center gap-1">
+                    <div className="text-sm text-text-muted flex items-center gap-1">
                       <MessageOutlined />
                       {q.answer_count}
                     </div>
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="text-lg font-medium text-purple-200 hover:text-white transition">
+                    <h3 className="text-lg font-medium text-text-primary hover:text-primary transition">
                       {q.title}
                     </h3>
 
-                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-200/60">
-                      <UserOutlined className="text-purple-300" />
+                    <div className="flex items-center gap-2 mt-2 text-sm text-text-muted">
+                      <UserOutlined className="text-primary" />
                       <span>{q.author.username}</span>
-                      <span className="text-gray-200/30">•</span>
-                      <ClockCircleOutlined className="text-purple-300" />
+                      <span className="text-text-muted">•</span>
+                      <ClockCircleOutlined className="text-primary" />
                       <span>{formatDate(q.created_at)}</span>
                     </div>
 
@@ -176,7 +176,7 @@ export default function Feed() {
                       {q.tags.map((tag) => (
                         <Tag
                           key={tag}
-                          className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
+                          className="!bg-hover-bg !border-border-soft !text-text-secondary"
                         >
                           {tag}
                         </Tag>
@@ -189,11 +189,11 @@ export default function Feed() {
           </div>
 
           {filteredQuestions.length === 0 && !isLoading && (
-            <div className="glass !rounded-2xl !text-white p-8 text-center">
-              <div className="text-gray-200/60 text-lg">
+            <div className="bg-surface !rounded-2xl !text-white p-8 text-center">
+              <div className="text-text-muted text-lg">
                 {searchTerm ? "No questions match your search" : "No questions in your feed yet"}
               </div>
-              <p className="text-sm text-gray-200/40 mt-2">
+              <p className="text-sm text-text-muted mt-2">
                 {searchTerm ? "Try a different search term" : "Start asking questions or voting on tags to build your feed"}
               </p>
             </div>

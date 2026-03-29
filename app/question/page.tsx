@@ -190,10 +190,10 @@ export default function QuestionFeed() {
   if (loading) {
     return (
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/40" />
+        <div className="glow -bottom-60 -right-60 bg-accent/40" />
         <div className="relative z-10 mx-auto max-w-[1200px] flex items-center justify-center min-h-[60vh]">
-          <Spin size="large" className="text-purple-300" />
+          <Spin size="large" className="text-text-muted" />
         </div>
       </div>
     );
@@ -207,8 +207,8 @@ export default function QuestionFeed() {
 
   return (
     <div className="relative starry min-h-screen px-4 py-6">
-      <div className="glow -top-60 -left-60 bg-purple-900/40" />
-      <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+      <div className="glow -top-60 -left-60 bg-accent/40" />
+      <div className="glow -bottom-60 -right-60 bg-accent/40" />
 
       <div className="relative z-10 mx-auto max-w-[1200px]">
         <header className="glass !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-6 flex items-center justify-between">
@@ -248,7 +248,7 @@ export default function QuestionFeed() {
             return (
               <Card
                 key={q.id}
-                className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
+                className="glass !rounded-2xl !text-white hover:!border-accent transition cursor-pointer"
                 onClick={() => handleQuestionClick(q.id)}
               >
                 <div className="flex items-start gap-4">
@@ -265,7 +265,7 @@ export default function QuestionFeed() {
 
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-lg font-medium text-purple-200 hover:text-white transition flex-1">
+                      <h3 className="text-lg font-medium text-text-primary hover:text-primary transition flex-1">
                         {q.title}
                       </h3>
                       {isOwner && (
@@ -274,7 +274,7 @@ export default function QuestionFeed() {
                             size="small"
                             icon={<EditOutlined />}
                             onClick={() => handleEditQuestion(q)}
-                            className="!bg-purple-500/20 !border-purple-400/30 !text-purple-200 hover:!bg-purple-500/30"
+                            className="!bg-selected-bg !border-accent/30 !text-text-primary hover:!bg-hover-bg"
                           >
                             Edit
                           </Button>
@@ -291,10 +291,10 @@ export default function QuestionFeed() {
                     </div>
 
                     <div className="flex items-center gap-2 mt-2 text-sm text-gray-200/60">
-                      <UserOutlined className="text-purple-300" />
+                      <UserOutlined className="text-text-secondary" />
                       <span>{q.author.username}</span>
                       <span className="text-gray-200/30">•</span>
-                      <ClockCircleOutlined className="text-purple-300" />
+                      <ClockCircleOutlined className="text-text-secondary" />
                       <span>{formatDate(q.created_at)}</span>
                     </div>
 
@@ -302,7 +302,7 @@ export default function QuestionFeed() {
                       {q.tags.map((tagItem) => (
                         <Tag
                           key={tagItem}
-                          className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
+                          className="!bg-hover-bg !border-border-soft !text-text-secondary"
                         >
                           {tagItem}
                         </Tag>

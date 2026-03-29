@@ -29,9 +29,9 @@ export default function AnswerForm({
   };
 
   return (
-    <div className="glass !rounded-2xl !text-white p-6">
-      <h3 className="text-xl font-semibold text-white mb-4">Your Answer</h3>
-      
+    <div className="bg-surface !rounded-2xl !text-white p-6 border border-border-soft">
+      <h3 className="text-xl font-semibold text-text-primary mb-4">Your Answer</h3>
+
       <RichTextEditor
         value={description}
         onChange={setDescription}
@@ -42,7 +42,7 @@ export default function AnswerForm({
           <Button
             icon={<CloseOutlined />}
             onClick={onCancel}
-            className="!bg-white/5 !text-white !border-white/10 hover:!border-purple-400/30"
+            className="!bg-surface !text-text-primary !border hover:!border-accent"
           >
             Cancel
           </Button>

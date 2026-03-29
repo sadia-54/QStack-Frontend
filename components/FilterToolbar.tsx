@@ -29,22 +29,22 @@ export default function FilterToolbar({
   hasActiveFilters,
 }: FilterToolbarProps) {
   return (
-    <div className="glass !border-0 backdrop-blur-xl rounded-2xl px-6 py-4 mb-6">
+    <div className="bg-surface rounded-2xl px-6 py-4 mb-6">
       <div className="flex flex-wrap items-center gap-4">
         {/* Search Input */}
         <div className="flex-1 min-w-[200px]">
           <Input
             placeholder="Search by title..."
-            prefix={<SearchOutlined className="text-purple-300" />}
+            prefix={<SearchOutlined className="text-text-secondary" />}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             allowClear
             size="large"
-            className="!bg-white/5 !border-purple-400/20 !text-white hover:!border-purple-400/40 focus:!border-purple-400/60"
+            className="filter-select filter-search-input"
             styles={{
               input: {
-                color: "white",
-                ["::placeholder" as any]: { color: "rgba(255,255,255,0.4)" },
+                color: "var(--color-text-primary)",
+                ["::placeholder" as any]: { color: "var(--color-text-muted)" },
               },
             }}
           />
@@ -54,7 +54,7 @@ export default function FilterToolbar({
         <div className="w-[180px]">
           <Select
             placeholder="Filter by tag..."
-            prefix={<FilterOutlined className="text-purple-300" />}
+            prefix={<FilterOutlined className="text-text-secondary" />}
             value={tag ? [tag] : []}
             onChange={(value) => onTagChange(value[0] || "")}
             allowClear
@@ -65,8 +65,8 @@ export default function FilterToolbar({
             className="filter-select"
             style={{ width: "100%" }}
             popupStyle={{
-              background: "rgba(17, 22, 44, 0.95)",
-              borderColor: "rgba(139, 92, 246, 0.3)",
+              background: "var(--color-surface-elevated)",
+              borderColor: "var(--color-border)",
             }}
             filterOption={(input, option) => {
               const children = option?.children;
@@ -87,11 +87,11 @@ export default function FilterToolbar({
             value={sort}
             onChange={onSortChange}
             size="large"
-            suffixIcon={<SortAscendingOutlined className="text-purple-300" />}
+            suffixIcon={<SortAscendingOutlined className="text-text-secondary" />}
             className="filter-select"
             popupStyle={{
-              background: "rgba(17, 22, 44, 0.95)",
-              borderColor: "rgba(139, 92, 246, 0.3)",
+              background: "var(--color-surface-elevated)",
+              borderColor: "var(--color-border)",
             }}
           >
             <Option value="newest">Newest</Option>
@@ -105,7 +105,7 @@ export default function FilterToolbar({
           <Button
             size="large"
             onClick={onClearFilters}
-            className="!bg-white/5 !text-white !border-purple-400/20 hover:!border-purple-400/40"
+            className="!bg-surface !text-text-primary !border hover:!border-accent"
           >
             Clear Filters
           </Button>

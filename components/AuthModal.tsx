@@ -100,7 +100,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <Input
             prefix={<MailOutlined />}
             placeholder="Email or Username"
-            className="!bg-white/5 !border-white/10 gap-1.5 hover:!border-purple-400/30 focus:!border-purple-400/50"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
           />
         </Form.Item>
 
@@ -111,7 +111,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <Input.Password
             prefix={<LockOutlined />}
             placeholder="Password"
-            className="!bg-white/5 !border-white/10 gap-1.5 hover:!border-purple-400/30 focus:!border-purple-400/50"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
           />
         </Form.Item>
 
@@ -151,7 +151,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <Input
             prefix={<MailOutlined />}
             placeholder="Email"
-            className="!bg-white/5 !border-white/10 gap-1.5 hover:!border-purple-400/30 focus:!border-purple-400/50"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
           />
         </Form.Item>
 
@@ -164,7 +164,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <Input
             prefix={<UserOutlined />}
             placeholder="Username"
-            className="!bg-white/5 !border-white/10 gap-1.5 hover:!border-purple-400/30 focus:!border-purple-400/50"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
           />
         </Form.Item>
 
@@ -177,7 +177,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <Input.Password
             prefix={<LockOutlined />}
             placeholder="Password"
-            className="!bg-white/5 !border-white/10 gap-1.5 hover:!border-purple-400/30 focus:!border-purple-400/50"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
           />
         </Form.Item>
 
@@ -206,7 +206,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       title={null}
     >
       <div className="p-4">
-        <h2 className="text-2xl font-semibold text-white text-center mb-6">
+        <h2 className="text-2xl font-semibold text-text-primary text-center mb-6">
           {activeTab === "signin" ? "Welcome Back" : "Join QStack"}
         </h2>
         <Tabs

@@ -52,7 +52,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-10 top-20 py-8 h-[calc(100vh-5rem)] w-64 glass !border-0 backdrop-blur-xl z-10 pb-6 px-5 overflow-y-auto">
+    <aside className="fixed  top-20 py-8 h-[calc(100vh-5rem)] w-64 bg-surface z-10 pb-6 px-5 overflow-y-auto">
       <Menu
         mode="vertical"
         selectedKeys={[pathname]}
