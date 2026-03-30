@@ -67,8 +67,8 @@ export const changePassword = async (
   newPassword: string
 ): Promise<{ message: string }> => {
   const token = localStorage.getItem("access_token");
-  const response = await fetch(`${BASE_URL}/users/password/change`, {
-    method: "PUT",
+  const response = await fetch(`${BASE_URL}/auth/change-password`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
