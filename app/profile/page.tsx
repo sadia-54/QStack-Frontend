@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Button, Tag, Avatar, Modal, Input, Space, message } from "antd";
+import { Card, Avatar, Space, Tag, Tabs, Form, Input, Button, message, List, Typography, Divider, Modal } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -10,24 +10,86 @@ import {
   ThunderboltOutlined,
   MessageOutlined,
   StarOutlined,
+  ClockCircleOutlined,
+  QuestionCircleOutlined,
+  CheckCircleOutlined,
+  CaretUpOutlined,
+  UnlockOutlined,
+  LockOutlined,
+  SafetyOutlined,
 } from "@ant-design/icons";
 import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
-import { fetchProfile, updateUserProfile } from "@/store/user/userThunks";
-import { Profile as ProfileType } from "@/types/user";
+import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail } from "@/store/user/userThunks";
+import { Profile as ProfileType, ActivityItem } from "@/types/user";
 
 const { TextArea } = Input;
+const { Text } = Typography;
+
+// Activity type icon mapping
+const getActivityIcon = (type: string) => {
+  switch (type) {
+    case "question":
+      return <QuestionCircleOutlined className="text-primary" />;
+    case "answer":
+      return <MessageOutlined className="text-success" />;
+    case "vote":
+      return <CaretUpOutlined className="text-warning" />;
+    case "accept":
+      return <CheckCircleOutlined className="text-success" />;
+    case "edit":
+      return <EditOutlined className="text-text-muted" />;
+    default:
+      return <ClockCircleOutlined className="text-text-muted" />;
+  }
+};
+
+// Activity type label mapping
+const getActivityLabel = (type: string) => {
+  switch (type) {
+    case "question":
+      return "Asked a question";
+    case "answer":
+      return "Provided an answer";
+    case "vote":
+      return "Received a vote";
+    case "accept":
+      return "Answer accepted";
+    case "edit":
+      return "Made an edit";
+    default:
+      return type;
+  }
+};
+
+// Format relative time
+const formatRelativeTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "just now";
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  return date.toLocaleDateString();
+};
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
   const { currentUserId } = useSelector((state: RootState) => state.auth);
-  const { profile, isLoading, error } = useSelector((state: RootState) => state.user);
+  const { profile, activities, isLoading, error, userEmail } = useSelector((state: RootState) => state.user);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [bio, setBio] = useState("");
+  const [activeTab, setActiveTab] = useState("profile");
+
+  // Password change form
+  const [passwordForm] = Form.useForm();
 
   useEffect(() => {
     if (currentUserId) {
       dispatch(fetchProfile(currentUserId));
+      dispatch(fetchUserEmail());
     }
   }, [dispatch, currentUserId]);
 
@@ -47,7 +109,7 @@ export default function ProfilePage() {
     setIsEditModalOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSaveBio = async () => {
     try {
       await dispatch(updateUserProfile(bio));
       message.success("Profile updated successfully");
@@ -57,12 +119,324 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelBio = () => {
     if (profile?.bio) {
       setBio(profile.bio);
     }
     setIsEditModalOpen(false);
   };
+
+  const handleLoadActivity = () => {
+    if (currentUserId && activities.length === 0) {
+      dispatch(fetchUserActivity(currentUserId));
+    }
+  };
+
+  const handlePasswordChange = async (values: any) => {
+    try {
+      await dispatch(updateUserPassword(values.currentPassword, values.newPassword));
+      message.success("Password changed successfully");
+      passwordForm.resetFields();
+    } catch (err) {
+      // Error already handled in thunk
+    }
+  };
+
+  // Profile tab content
+  const ProfileTab = () => (
+    <div className="space-y-6">
+      {/* Bio Section */}
+      <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-accent/50 transition">
+        <div className="flex items-start justify-between mb-4">
+          <h3 className="text-lg font-semibold text-text-primary">About Me</h3>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={handleEditClick}
+            className="!text-primary hover:!text-primary-hover"
+          >
+            Edit
+          </Button>
+        </div>
+        {profile?.bio ? (
+          <p className="text-text-secondary leading-relaxed">{profile.bio}</p>
+        ) : (
+          <p className="text-text-muted italic">No bio set yet. Click Edit to add one.</p>
+        )}
+      </Card>
+
+      {/* Stats Grid */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-warning/50 transition">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-lg bg-surface-elevated flex items-center justify-center text-warning">
+              <StarOutlined className="text-2xl" />
+            </div>
+            <div>
+              <div className="text-2xl font-semibold text-text-primary">
+                {profile?.total_votes || 0}
+              </div>
+              <div className="text-sm text-text-muted">Reputation</div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-primary/50 transition">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-lg bg-surface-elevated flex items-center justify-center text-primary">
+              <ThunderboltOutlined className="text-2xl" />
+            </div>
+            <div>
+              <div className="text-2xl font-semibold text-text-primary">
+                {profile?.total_questions || 0}
+              </div>
+              <div className="text-sm text-text-muted">Questions</div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-success/50 transition">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-lg bg-surface-elevated flex items-center justify-center text-success">
+              <MessageOutlined className="text-2xl" />
+            </div>
+            <div>
+              <div className="text-2xl font-semibold text-text-primary">
+                {profile?.total_answers || 0}
+              </div>
+              <div className="text-sm text-text-muted">Answers</div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Preferred Tags */}
+      <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-primary/50 transition">
+        <h3 className="text-lg font-semibold mb-4 text-text-primary">Preferred Tags</h3>
+        {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {profile.preferred_tags.map((tag) => (
+              <Tag
+                key={tag}
+                className="!bg-hover-bg !border-border-soft !text-text-secondary hover:!border-primary/50 transition"
+              >
+                {tag}
+              </Tag>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-text-muted">No preferred tags set</p>
+        )}
+      </Card>
+    </div>
+  );
+
+  // Activity tab content
+  const ActivityTab = () => {
+    const sortedActivities = [...activities].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    return (
+      <Card className="bg-surface !rounded-xl !border-border-soft">
+        <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
+          <ClockCircleOutlined />
+          Recent Activity
+        </h3>
+        {activities.length === 0 ? (
+          <div className="text-center py-12">
+            <ClockCircleOutlined className="text-4xl text-text-muted mb-3" />
+            <p className="text-text-muted">No activity yet</p>
+          </div>
+        ) : (
+          <List
+            dataSource={sortedActivities}
+            renderItem={(item) => (
+              <List.Item className="!border-border-soft hover:!bg-hover-bg transition px-4 py-3 rounded-lg">
+                <List.Item.Meta
+                  avatar={
+                    <div className="h-10 w-10 rounded-lg bg-surface-elevated flex items-center justify-center text-lg">
+                      {getActivityIcon(item.type)}
+                    </div>
+                  }
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Text className="!text-text-primary font-medium">
+                        {getActivityLabel(item.type)}
+                      </Text>
+                      {item.value !== undefined && item.value !== 0 && (
+                        <Tag className="!bg-primary/20 !border-primary/30 !text-primary">
+                          {item.value > 0 ? `+${item.value}` : item.value}
+                        </Tag>
+                      )}
+                    </div>
+                  }
+                  description={
+                    <div className="space-y-1">
+                      {item.title && (
+                        <p className="!text-text-secondary text-sm">{item.title}</p>
+                      )}
+                      <p className="!text-text-muted text-xs">
+                        {formatRelativeTime(item.created_at)}
+                      </p>
+                    </div>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
+    );
+  };
+
+  // Settings tab content
+  const SettingsTab = () => (
+    <div className="space-y-6">
+      {/* Change Password */}
+      <Card className="bg-surface !rounded-xl !border-border-soft">
+        <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
+          <LockOutlined />
+          Change Password
+        </h3>
+        <Form
+          form={passwordForm}
+          layout="vertical"
+          onFinish={handlePasswordChange}
+          className="max-w-md"
+        >
+          <Form.Item
+            label={<span className="!text-text-secondary">Current Password</span>}
+            name="currentPassword"
+            rules={[{ required: true, message: "Please enter your current password" }]}
+          >
+            <Input.Password
+              className="!bg-surface-elevated !text-text-primary !border-border-soft hover:!border-accent focus:!border-primary"
+              placeholder="Enter current password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span className="!text-text-secondary">New Password</span>}
+            name="newPassword"
+            rules={[
+              { required: true, message: "Please enter your new password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+            ]}
+          >
+            <Input.Password
+              className="!bg-surface-elevated !text-text-primary !border-border-soft hover:!border-accent focus:!border-primary"
+              placeholder="Enter new password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span className="!text-text-secondary">Confirm New Password</span>}
+            name="confirmPassword"
+            dependencies={["newPassword"]}
+            rules={[
+              { required: true, message: "Please confirm your new password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("newPassword") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Passwords do not match"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password
+              className="!bg-surface-elevated !text-text-primary !border-border-soft hover:!border-accent focus:!border-primary"
+              placeholder="Confirm new password"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Space>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="btn-gradient"
+                loading={isLoading}
+                icon={<SafetyOutlined />}
+              >
+                Change Password
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
+
+      {/* Account Info */}
+      <Card className="bg-surface !rounded-xl !border-border-soft">
+        <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
+          <UserOutlined />
+          Account Information
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <UnlockOutlined className="text-text-muted" />
+            <div>
+              <p className="text-sm text-text-secondary">Username</p>
+              <p className="text-text-primary">{profile?.username}</p>
+            </div>
+          </div>
+          <Divider className="!border-border-soft" />
+          <div className="flex items-center gap-3">
+            <MailOutlined className="text-text-muted" />
+            <div>
+              <p className="text-sm text-text-secondary">Email</p>
+              <p className="text-text-primary">{userEmail || "N/A"}</p>
+            </div>
+          </div>
+          <Divider className="!border-border-soft" />
+          <div className="flex items-center gap-3">
+            <ClockCircleOutlined className="text-text-muted" />
+            <div>
+              <p className="text-sm text-text-secondary">Member Since</p>
+              <p className="text-text-primary">
+                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "N/A"}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+
+  const tabItems = [
+    {
+      key: "profile",
+      label: (
+        <span className="flex items-center gap-2">
+          <UserOutlined />
+          Profile
+        </span>
+      ),
+      children: <ProfileTab />,
+    },
+    {
+      key: "activity",
+      label: (
+        <span className="flex items-center gap-2">
+          <ClockCircleOutlined />
+          Activity
+        </span>
+      ),
+      children: <ActivityTab />,
+    },
+    {
+      key: "settings",
+      label: (
+        <span className="flex items-center gap-2">
+          <LockOutlined />
+          Settings
+        </span>
+      ),
+      children: <SettingsTab />,
+    },
+  ];
 
   if (isLoading && !profile) {
     return (
@@ -83,13 +457,13 @@ export default function ProfilePage() {
         <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1200px]">
-          {/* Profile Header */}
-          <Card className="bg-surface !rounded-2xl !text-white hover:!border-accent transition mb-6">
-            <div className="flex items-center gap-6">
+          {/* Profile Header - Stack Overflow Style */}
+          <Card className="bg-surface !rounded-2xl !border-border-soft hover:!border-accent/50 transition mb-6">
+            <div className="flex items-start gap-6">
               <Avatar
                 size={80}
                 icon={<UserOutlined />}
-                className="!bg-hover-bg !border-2 !border-primary/30"
+                className="!bg-surface-elevated !border-2 !border-primary/30"
               />
               <div className="flex-1">
                 <h1 className="text-2xl font-semibold text-text-primary">
@@ -97,11 +471,25 @@ export default function ProfilePage() {
                 </h1>
                 <p className="text-sm text-text-muted flex items-center gap-2 mt-1">
                   <MailOutlined />
-                  {profile?.username ? `${profile.username}@qstack.com` : "user@example.com"}
+                  {userEmail || "user@example.com"}
                 </p>
                 {profile?.bio && (
-                  <p className="text-sm text-text-secondary mt-2">{profile.bio}</p>
+                  <p className="text-sm text-text-secondary mt-3 line-clamp-2">{profile.bio}</p>
                 )}
+                <div className="flex items-center gap-4 mt-4">
+                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                    <StarOutlined className="text-warning" />
+                    <span>{profile?.total_votes || 0} reputation</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                    <ThunderboltOutlined className="text-primary" />
+                    <span>{profile?.total_questions || 0} questions</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                    <MessageOutlined className="text-success" />
+                    <span>{profile?.total_answers || 0} answers</span>
+                  </div>
+                </div>
               </div>
               <Button
                 className="btn-gradient"
@@ -113,86 +501,36 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6">
-            <Card
-              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-warning mb-3">
-                  <StarOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-text-primary">
-                  {profile?.total_votes || 0}
-                </div>
-                <div className="text-sm text-text-muted mt-1">Reputation</div>
-              </div>
-            </Card>
-
-            <Card
-              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-primary mb-3">
-                  <ThunderboltOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-text-primary">
-                  {profile?.total_questions || 0}
-                </div>
-                <div className="text-sm text-text-muted mt-1">Questions</div>
-              </div>
-            </Card>
-
-            <Card
-              className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-surface flex items-center justify-center text-success mb-3">
-                  <MessageOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-text-primary">
-                  {profile?.total_answers || 0}
-                </div>
-                <div className="text-sm text-text-muted mt-1">Answers</div>
-              </div>
-            </Card>
-
-            {/* Preferred Tags */}
-            <Card className="bg-surface !rounded-2xl !text-white hover:!border-primary transition">
-              <h3 className="text-lg font-semibold mb-4 text-text-primary">Preferred Tags</h3>
-              {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.preferred_tags.map((tag) => (
-                    <Tag
-                      key={tag}
-                      className="!bg-hover-bg !border-border-soft !text-text-secondary"
-                    >
-                      {tag}
-                    </Tag>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-text-muted">No preferred tags set</p>
-              )}
-            </Card>
-          </div>
+          {/* Tabs Section */}
+          <Tabs
+            activeKey={activeTab}
+            onChange={(key) => {
+              setActiveTab(key);
+              if (key === "activity") {
+                handleLoadActivity();
+              }
+            }}
+            items={tabItems}
+            className="!text-white"
+            destroyInactiveTabPane={true}
+          />
         </div>
 
         {/* Edit Profile Modal */}
         <Modal
           title="Edit Profile"
           open={isEditModalOpen}
-          onOk={handleSave}
-          onCancel={handleCancel}
+          onOk={handleSaveBio}
+          onCancel={handleCancelBio}
           className="glass-modal"
           footer={[
-            <Button key="cancel" onClick={handleCancel} className="!text-text-secondary">
+            <Button key="cancel" onClick={handleCancelBio} className="!text-text-secondary">
               Cancel
             </Button>,
             <Button
               key="save"
               type="primary"
-              onClick={handleSave}
+              onClick={handleSaveBio}
               className="btn-gradient"
               loading={isLoading}
             >

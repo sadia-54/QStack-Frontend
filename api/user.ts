@@ -1,4 +1,4 @@
-import { User, Profile } from "@/types/user";
+import { User, Profile, ActivityItem } from "@/types/user";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -43,6 +43,56 @@ export const updateProfile = async (bio: string): Promise<{ message: string }> =
   if (!response.ok) {
     const data = await response.json();
     throw new Error(data.error || "Failed to update profile");
+  }
+  return response.json();
+};
+
+export const getUserActivity = async (userId: number): Promise<ActivityItem[]> => {
+  const token = localStorage.getItem("access_token");
+  const response = await fetch(`${BASE_URL}/users/${userId}/activity`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to fetch activity");
+  }
+  return response.json();
+};
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ message: string }> => {
+  const token = localStorage.getItem("access_token");
+  const response = await fetch(`${BASE_URL}/users/password/change`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to change password");
+  }
+  return response.json();
+};
+
+export const getMyProfile = async (): Promise<User> => {
+  const token = localStorage.getItem("access_token");
+  const response = await fetch(`${BASE_URL}/users/me`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to fetch profile");
   }
   return response.json();
 };

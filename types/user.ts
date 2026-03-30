@@ -16,4 +16,13 @@ export interface Profile {
   total_answers: number;
   total_votes: number;
   preferred_tags?: string[];
+  created_at?: string;
+}
+
+export interface ActivityItem {
+  type: string; // question, answer, vote, edit, accept
+  title?: string;
+  target_id?: number;
+  value?: number;
+  created_at: string;
 }

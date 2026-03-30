@@ -36,7 +36,10 @@ export default function Navbar() {
             onClick={() => router.push("/")}
             className="cursor-pointer select-none"
           >
-            <span className="text-3xl font-bold bg-gradient-to-r from-[#e6edf3] via-[#9da7b3] to-[#4f8cff] bg-clip-text text-transparent transition-all duration-300 hover:brightness-110">
+            <span
+              style={{ fontFamily: "'Syne', sans-serif" }}
+              className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-[#f0f6fc] via-[#93c5fd] to-[#3b82f6] bg-clip-text text-transparent"
+            >
               QStack
             </span>
           </div>
