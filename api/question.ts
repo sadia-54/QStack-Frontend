@@ -157,3 +157,31 @@ export const getMyFeed = async (
 
   return res.json();
 };
+
+export const getMyQuestions = async (
+  params?: { limit?: number; offset?: number },
+  accessToken?: string | null
+) => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.limit) searchParams.append("limit", params.limit.toString());
+  if (params?.offset) searchParams.append("offset", params.offset.toString());
+
+  const queryString = searchParams.toString();
+  const url = `${BASE_URL}/questions/my${queryString ? `?${queryString}` : ""}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: accessToken
+      ? {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      : undefined,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch my questions");
+  }
+
+  return res.json();
+};

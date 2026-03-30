@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Avatar, Space, Tag, Tabs, Form, Input, Button, message, List, Typography, Divider, Modal } from "antd";
+import { Card, Avatar, Space, Tag, Tabs, Form, Input, Button, message, List, Typography, Divider, Modal, Pagination } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -18,13 +18,17 @@ import {
   LockOutlined,
   SafetyOutlined,
 } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
 import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail } from "@/store/user/userThunks";
-import { Profile as ProfileType, ActivityItem } from "@/types/user";
+import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
+import { Question } from "@/types/question";
 
 const { TextArea } = Input;
 const { Text } = Typography;
+
+const PAGE_SIZE = 5;
 
 // Activity type icon mapping
 const getActivityIcon = (type: string) => {
@@ -77,11 +81,14 @@ const formatRelativeTime = (dateString: string) => {
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const { currentUserId } = useSelector((state: RootState) => state.auth);
   const { profile, activities, isLoading, error, userEmail } = useSelector((state: RootState) => state.user);
+  const { questions: myQuestions, isLoading: isQuestionsLoading } = useSelector((state: RootState) => state.myQuestions);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [bio, setBio] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Password change form
   const [passwordForm] = Form.useForm();
@@ -114,7 +121,7 @@ export default function ProfilePage() {
       await dispatch(updateUserProfile(bio));
       message.success("Profile updated successfully");
       setIsEditModalOpen(false);
-    } catch (err) {
+    } catch (_err) {
       message.error("Failed to update profile");
     }
   };
@@ -132,12 +139,26 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePasswordChange = async (values: any) => {
+  const handleLoadMyQuestions = () => {
+    if (currentUserId && myQuestions.length === 0) {
+      dispatch(fetchMyQuestions({ limit: 20, offset: 0 }));
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleQuestionClick = (id: number) => {
+    router.push(`/question/${id}`);
+  };
+
+  const handlePasswordChange = async (values: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
     try {
       await dispatch(updateUserPassword(values.currentPassword, values.newPassword));
       message.success("Password changed successfully");
       passwordForm.resetFields();
-    } catch (err) {
+    } catch (_err) {
       // Error already handled in thunk
     }
   };
@@ -290,6 +311,94 @@ export default function ProfilePage() {
     );
   };
 
+  // My Questions tab content
+  const MyQuestionsTab = () => {
+    const totalPages = Math.ceil(myQuestions.length / PAGE_SIZE);
+    const paginatedQuestions = myQuestions.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE
+    );
+
+    return (
+      <Card className="bg-surface !rounded-xl !border-border-soft">
+      
+        {isQuestionsLoading && myQuestions.length === 0 ? (
+          <div className="text-center py-12">
+            <ClockCircleOutlined className="text-4xl text-text-muted mb-3" />
+            <p className="text-text-muted">Loading questions...</p>
+          </div>
+        ) : myQuestions.length === 0 ? (
+          <div className="text-center py-12">
+            <QuestionCircleOutlined className="text-4xl text-text-muted mb-3" />
+            <p className="text-text-muted">No questions yet</p>
+          </div>
+        ) : (
+          <>
+            <List
+              dataSource={paginatedQuestions}
+              renderItem={(item: Question) => (
+                <List.Item
+                  className="!border-border-soft hover:!bg-hover-bg transition px-4 py-3 rounded-lg cursor-pointer"
+                  onClick={() => handleQuestionClick(item.id)}
+                >
+                  <List.Item.Meta
+                    title={
+                      <div className="flex items-center gap-2">
+                        <Text className="!text-text-primary font-medium">
+                          {item.title}
+                        </Text>
+                      </div>
+                    }
+                    description={
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4 text-xs text-text-muted">
+                          <span className="flex items-center gap-1">
+                            <ThunderboltOutlined className="text-warning" />
+                            {item.vote_count} votes
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageOutlined className="text-primary" />
+                            {item.answer_count} answers
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <ClockCircleOutlined />
+                            {formatRelativeTime(item.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags.map((tag) => (
+                            <Tag
+                              key={tag}
+                              className="!bg-hover-bg !border-border-soft !text-text-secondary !text-xs"
+                            >
+                              {tag}
+                            </Tag>
+                          ))}
+                        </div>
+                      </div>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <Pagination
+                  current={currentPage}
+                  total={myQuestions.length}
+                  pageSize={PAGE_SIZE}
+                  onChange={handlePageChange}
+                  showSizeChanger={false}
+                  showLessItems
+                />
+              </div>
+            )}
+          </>
+        )}
+      </Card>
+    );
+  };
+
   // Settings tab content
   const SettingsTab = () => (
     <div className="space-y-6">
@@ -417,6 +526,16 @@ export default function ProfilePage() {
       children: <ProfileTab />,
     },
     {
+      key: "my-questions",
+      label: (
+        <span className="flex items-center gap-2">
+          <QuestionCircleOutlined />
+          My Questions
+        </span>
+      ),
+      children: <MyQuestionsTab />,
+    },
+    {
       key: "activity",
       label: (
         <span className="flex items-center gap-2">
@@ -508,6 +627,10 @@ export default function ProfilePage() {
               setActiveTab(key);
               if (key === "activity") {
                 handleLoadActivity();
+              }
+              if (key === "my-questions") {
+                setCurrentPage(1);
+                handleLoadMyQuestions();
               }
             }}
             items={tabItems}
