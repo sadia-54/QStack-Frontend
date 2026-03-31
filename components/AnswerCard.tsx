@@ -9,26 +9,46 @@ import {
   EditOutlined,
   DownOutlined,
   UpOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { Answer } from "@/types/answer";
+import { Comment } from "@/types/comment";
 import { useState } from "react";
+import CommentList from "./CommentList";
+import CommentForm from "./CommentForm";
 
 interface Props {
   answer: Answer;
   isQuestionOwner: boolean;
   isAnswerOwner: boolean;
+  currentUserId: number | null;
+  isAuthenticated: boolean;
+  comments: Comment[];
   onAccept?: (answerId: number) => void;
   onEdit?: (answer: Answer) => void;
   onDelete?: (answerId: number) => void;
+  onAddComment?: (body: string) => Promise<void>;
+  onEditComment?: (comment: Comment) => void;
+  onDeleteComment?: (commentId: number) => void;
+  onToggleComments?: () => void;
+  showComments: boolean;
 }
 
 export default function AnswerCard({
   answer,
   isQuestionOwner,
   isAnswerOwner,
+  currentUserId,
+  isAuthenticated,
+  comments,
   onAccept,
   onEdit,
   onDelete,
+  onAddComment,
+  onEditComment,
+  onDeleteComment,
+  onToggleComments,
+  showComments,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(answer.is_accepted);
 
@@ -141,6 +161,19 @@ export default function AnswerCard({
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Comment toggle button */}
+                  <Button
+                    size="small"
+                    icon={<MessageOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleComments?.();
+                    }}
+                    className="!bg-selected-bg !border-border-soft !text-text-primary hover:!bg-hover-bg flex-shrink-0"
+                  >
+                    {comments.length > 0 ? `${comments.length}` : "Comment"}
+                  </Button>
+
                   {/* Accept button - only for question owner and not own answer */}
                   {showAcceptButton && (
                     <Button
@@ -185,6 +218,25 @@ export default function AnswerCard({
                   )}
                 </div>
               </div>
+
+              {/* Comments section */}
+              {showComments && (
+                <>
+                  <div className="h-px bg-border-soft my-4" />
+                  <CommentList
+                    comments={comments}
+                    currentUserId={currentUserId}
+                    onDelete={(commentId) => onDeleteComment?.(commentId)}
+                    onEdit={(comment) => onEditComment?.(comment)}
+                  />
+                  {isAuthenticated && (
+                    <CommentForm
+                      onSubmit={(body) => onAddComment?.(body) || Promise.resolve()}
+                      disabled={false}
+                    />
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>

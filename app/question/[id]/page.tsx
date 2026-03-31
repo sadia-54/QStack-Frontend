@@ -30,6 +30,14 @@ import AnswerCard from "@/components/AnswerCard";
 import AnswerForm from "@/components/AnswerForm";
 import EditAnswerModal from "@/components/EditAnswerModal";
 import EditQuestionModal from "@/components/EditQuestionModal";
+import { Comment } from "@/types/comment";
+import {
+  getCommentsByAnswer,
+  createComment,
+  updateComment,
+  deleteComment,
+} from "@/api/comment";
+import EditCommentModal from "@/components/EditCommentModal";
 
 function useQuestionState() {
   const [question, setQuestion] = useState<Question | null>(null);
@@ -54,6 +62,11 @@ export default function QuestionDetail() {
   const [updating, setUpdating] = useState(false);
   const [isEditQuestionModalOpen, setIsEditQuestionModalOpen] = useState(false);
   const [updatingQuestion, setUpdatingQuestion] = useState(false);
+  const [commentsByAnswer, setCommentsByAnswer] = useState<Record<number, Comment[]>>({});
+  const [expandedComments, setExpandedComments] = useState<Record<number, boolean>>({});
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
+  const [isEditCommentModalOpen, setIsEditCommentModalOpen] = useState(false);
+  const [updatingComment, setUpdatingComment] = useState(false);
 
   const questionId = params.id ? parseInt(params.id as string) : 0;
 
@@ -105,6 +118,25 @@ export default function QuestionDetail() {
     } catch (error) {
       console.error("Failed to fetch answers:", error);
       setAnswers([]);
+    }
+  };
+
+  const fetchComments = async (answerId: number) => {
+    try {
+      const comments = await getCommentsByAnswer(answerId);
+      setCommentsByAnswer((prev) => ({ ...prev, [answerId]: comments }));
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    }
+  };
+
+  const toggleComments = async (answerId: number) => {
+    const isExpanded = !!expandedComments[answerId];
+    setExpandedComments((prev) => ({ ...prev, [answerId]: !isExpanded }));
+    
+    // Fetch comments on first expand
+    if (!isExpanded && !commentsByAnswer[answerId]) {
+      await fetchComments(answerId);
     }
   };
 
@@ -214,6 +246,60 @@ export default function QuestionDetail() {
       router.push("/question");
     } catch (error: any) {
       message.error(error.message || "Failed to delete question");
+    }
+  };
+
+  const handleAddComment = async (answerId: number, body: string) => {
+    if (!accessToken) {
+      message.error("Please login to comment");
+      return;
+    }
+
+    try {
+      await createComment(answerId, { body }, accessToken);
+      message.success("Comment added!");
+      await fetchComments(answerId);
+    } catch (error: any) {
+      message.error(error.message || "Failed to add comment");
+    }
+  };
+
+  const handleDeleteComment = async (answerId: number, commentId: number) => {
+    if (!accessToken) return;
+
+    try {
+      await deleteComment(commentId, accessToken);
+      message.success("Comment deleted!");
+      await fetchComments(answerId);
+    } catch (error: any) {
+      message.error(error.message || "Failed to delete comment");
+    }
+  };
+
+  const handleEditCommentClick = (comment: Comment) => {
+    setEditingComment(comment);
+    setIsEditCommentModalOpen(true);
+  };
+
+  const handleUpdateComment = async (body: string) => {
+    if (!editingComment || !accessToken) return;
+
+    setUpdatingComment(true);
+    try {
+      await updateComment(editingComment.id, { body }, accessToken);
+      message.success("Comment updated!");
+      setIsEditCommentModalOpen(false);
+      setEditingComment(null);
+      // Refetch comments for all expanded answers to get updated comment
+      await Promise.all(
+        Object.keys(expandedComments)
+          .filter((id) => expandedComments[parseInt(id)])
+          .map((id) => fetchComments(parseInt(id)))
+      );
+    } catch (error: any) {
+      message.error(error.message || "Failed to update comment");
+    } finally {
+      setUpdatingComment(false);
     }
   };
 
@@ -415,9 +501,17 @@ export default function QuestionDetail() {
                   answer={answer}
                   isQuestionOwner={isQuestionOwner}
                   isAnswerOwner={currentUserIdNum ? answer.author.id === currentUserIdNum : false}
+                  currentUserId={currentUserIdNum}
+                  isAuthenticated={isAuthenticated}
+                  comments={commentsByAnswer[answer.id] || []}
+                  showComments={!!expandedComments[answer.id]}
                   onAccept={handleAcceptAnswer}
                   onEdit={handleEditClick}
                   onDelete={handleDeleteAnswer}
+                  onAddComment={(body) => handleAddComment(answer.id, body)}
+                  onEditComment={(comment) => handleEditCommentClick(comment)}
+                  onDeleteComment={(commentId) => handleDeleteComment(answer.id, commentId)}
+                  onToggleComments={() => toggleComments(answer.id)}
                 />
               ))}
             </div>
@@ -473,6 +567,18 @@ export default function QuestionDetail() {
           setIsEditQuestionModalOpen(false);
         }}
         onSuccess={fetchQuestion}
+      />
+
+      {/* Edit Comment Modal */}
+      <EditCommentModal
+        comment={editingComment}
+        open={isEditCommentModalOpen}
+        onClose={() => {
+          setIsEditCommentModalOpen(false);
+          setEditingComment(null);
+        }}
+        onSubmit={handleUpdateComment}
+        isSubmitting={updatingComment}
       />
     </div>
   );
