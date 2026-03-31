@@ -2,10 +2,9 @@
 
 import { Menu } from "antd";
 import {
-  DashboardOutlined,
+  HomeOutlined,
   UserOutlined,
   ReadOutlined,
-  QuestionCircleOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
@@ -21,9 +20,9 @@ export default function Sidebar() {
 
   const menuItems = [
     {
-      key: "/dashboard",
-      icon: <DashboardOutlined />,
-      label: "Dashboard",
+      key: "/home",
+      icon: <HomeOutlined />,
+      label: "Home",
     },
     {
       key: "/profile",
@@ -34,11 +33,6 @@ export default function Sidebar() {
       key: "/feed",
       icon: <ReadOutlined />,
       label: "My Feed",
-    },
-    {
-      key: "/question",
-      icon: <QuestionCircleOutlined />,
-      label: "Question",
     },
     {
       key: "/users",

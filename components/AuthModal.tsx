@@ -57,7 +57,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       message.success("Login successful!");
       signInForm.resetFields();
       onClose();
-      router.push("/dashboard");
+      router.push("/home");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";
       dispatch(loginFailure(errorMessage));

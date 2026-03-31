@@ -37,3 +37,14 @@ export interface FeedResponse {
 export interface VoteQuestionRequest {
   value: 1 | -1;
 }
+
+export interface TagStat {
+  tag: string;
+  count: number;
+}
+
+export interface CommunityStats {
+  total_users: number;
+  total_questions: number;
+  total_answers: number;
+}

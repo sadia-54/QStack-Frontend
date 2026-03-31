@@ -23,8 +23,8 @@ export default function Navbar() {
     router.push("/");
   };
 
-  const handleDashboardClick = () => {
-    router.push("/dashboard");
+  const handleHomeClick = () => {
+    router.push("/home");
   };
 
   return (
@@ -60,9 +60,9 @@ export default function Navbar() {
             <Button
               className="!bg-surface !text-text-primary !border border-soft hover:!border-accent"
               icon={<UserOutlined />}
-              onClick={handleDashboardClick}
+              onClick={handleHomeClick}
             >
-              Dashboard
+              Home
             </Button>
             <Button
               className="btn-gradient"

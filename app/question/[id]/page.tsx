@@ -291,10 +291,10 @@ export default function QuestionDetail() {
       <div className="relative z-10 mx-auto max-w-[900px]">
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => router.push("/question")}
+          onClick={() => router.push("/home")}
           className="mb-6 !bg-selected-bg !border-border !text-text-primary hover:!bg-hover-bg"
         >
-          Back to Feed
+          Back to Home
         </Button>
 
         {/* Question Card */}

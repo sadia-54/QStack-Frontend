@@ -1,4 +1,4 @@
-import { CreateQuestionRequest, FeedQueryParams, VoteQuestionRequest } from "../types/question";
+import { CreateQuestionRequest, FeedQueryParams, VoteQuestionRequest, TagStat, CommunityStats } from "../types/question";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -181,6 +181,30 @@ export const getMyQuestions = async (
 
   if (!res.ok) {
     throw new Error("Failed to fetch my questions");
+  }
+
+  return res.json();
+};
+
+export const getPopularTags = async (): Promise<TagStat[]> => {
+  const res = await fetch(`${BASE_URL}/tags/popular`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch popular tags");
+  }
+
+  return res.json();
+};
+
+export const getCommunityStats = async (): Promise<CommunityStats> => {
+  const res = await fetch(`${BASE_URL}/users/community/stats`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch community stats");
   }
 
   return res.json();
