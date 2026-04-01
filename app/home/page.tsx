@@ -14,6 +14,7 @@ import {
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
+import { Modal } from "antd";
 import { getQuestionFeed, updateQuestion, deleteQuestion, getPopularTags, getCommunityStats } from "@/api/question";
 import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, CommunityStats } from "@/types/question";
 import AskQuestionModal from "@/components/AskQuestionModal";
@@ -72,6 +73,8 @@ function HomePageContent() {
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [popularTags, setPopularTags] = useState<TagStat[]>([]);
   const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState("");
@@ -253,11 +256,20 @@ function HomePageContent() {
     }
   };
 
-  const handleDeleteQuestion = async (id: number) => {
+  const handleDeleteQuestion = (id: number) => {
+    setDeleteTarget(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
     try {
-      await deleteQuestion(id);
+      await deleteQuestion(deleteTarget);
       message.success("Question deleted successfully!");
       await fetchQuestions();
+      setIsDeleteModalOpen(false);
+      setDeleteTarget(null);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to delete question";
       message.error(errorMessage);
@@ -537,6 +549,30 @@ function HomePageContent() {
         }}
         onSuccess={fetchQuestions}
       />
+
+      <Modal
+        title={
+          <div className="flex items-center gap-3">
+            <DeleteOutlined className="text-error text-xl" />
+            <span>Confirm Delete</span>
+          </div>
+        }
+        open={isDeleteModalOpen}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTarget(null);
+        }}
+        onOk={handleConfirmDelete}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+        centered
+        className="!text-white"
+      >
+        <div className="text-text-secondary py-4">
+          <p>Are you sure you want to delete this question? This action cannot be undone.</p>
+        </div>
+      </Modal>
     </AuthGuard>
   );
 }

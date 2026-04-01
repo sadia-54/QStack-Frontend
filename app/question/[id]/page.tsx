@@ -613,10 +613,6 @@ export default function QuestionDetail() {
           </div>
         }
         open={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setDeleteTarget(null);
-        }}
         onOk={handleConfirmDelete}
         onCancel={() => {
           setIsDeleteModalOpen(false);
