@@ -412,7 +412,7 @@ export default function QuestionDetail() {
                   className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   title={isAuthenticated ? "Downvote" : "Login to vote"}
                 />
-                <span className="text-xs text-text-muted uppercase tracking-wide">votes</span>
+                <span className="text-meta text-text-muted uppercase tracking-wide">votes</span>
               </div>
               <div className="w-8 h-px bg-border" />
               <div className="flex flex-col items-center">
@@ -420,7 +420,7 @@ export default function QuestionDetail() {
                 <span className="text-2xl font-bold text-text-primary">
                   {question.answer_count}
                 </span>
-                <span className="text-xs text-text-muted uppercase tracking-wide">answers</span>
+                <span className="text-meta text-text-muted uppercase tracking-wide">answers</span>
               </div>
             </div>
 
@@ -451,10 +451,10 @@ export default function QuestionDetail() {
                 )}
               </div>
 
-              <div className="flex items-center gap-3 text-sm text-text-muted mb-4 pb-4 border-b border-border-soft">
+              <div className="flex items-center gap-3 text-meta text-text-muted mb-4 pb-4 border-b border-border-soft">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
-                    <UserOutlined className="text-primary text-xs" />
+                    <UserOutlined className="text-primary text-meta" />
                   </div>
                   <span>{question.author.username}</span>
                 </div>
@@ -470,7 +470,7 @@ export default function QuestionDetail() {
                   question.tags.map((tag) => (
                     <Tag
                       key={tag}
-                      className="!bg-hover-bg !border-border-soft !text-text-secondary !text-sm !px-3 !py-1"
+                      className="!bg-hover-bg !border-border-soft !text-text-secondary !text-meta !px-3 !py-1"
                     >
                       {tag}
                     </Tag>
@@ -488,7 +488,7 @@ export default function QuestionDetail() {
 
         {/* Answers Section */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-4">
+          <h2 className="text-title mb-4 text-text-primary">
             {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
           </h2>
 

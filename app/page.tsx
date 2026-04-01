@@ -56,13 +56,14 @@ export default function Home() {
                 className="btn-gradient"
                 type="primary"
                 size="large"
+                style={{ width: "200px" }}
                 onClick={() => setIsAuthModalOpen(true)}
               >
-                Get Started
-              </Button>
-              <Button size="large" className="!bg-surface !text-text-primary !border hover:!border-accent" onClick={() => router.push("/question")}>
                 Explore Questions
               </Button>
+              {/* <Button size="large" className="!bg-surface !text-text-primary !border hover:!border-accent" onClick={() => router.push("/home")}>
+                Explore Questions
+              </Button> */}
             </div>
           </div>
 
@@ -87,7 +88,7 @@ export default function Home() {
 
                     <div>
                       <div className="text-base font-semibold">{f.title}</div>
-                      <div className="text-sm text-text-muted mt-1">
+                      <div className="text-meta text-text-muted mt-1">
                         {f.desc}
                       </div>
                     </div>
@@ -111,7 +112,7 @@ export default function Home() {
               ].map((s) => (
                 <div key={s.t} className="bg-surface rounded-2xl p-4 border border-border">
                   <div className="text-primary font-semibold">{s.t}</div>
-                  <div className="text-sm text-text-muted mt-1">{s.d}</div>
+                  <div className="text-meta text-text-muted mt-1">{s.d}</div>
                 </div>
               ))}
             </div>

@@ -115,7 +115,7 @@ export default function EditQuestionModal({
       title={
         <div>
           <EditOutlined className="text-primary" />
-          <span className="text-xl font-semibold text-text-primary">Edit Question</span>
+          <span className="text-title text-text-primary">Edit Question</span>
         </div>
       }
     >

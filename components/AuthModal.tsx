@@ -112,7 +112,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         >
           Back to Sign In
         </Button>
-        <h3 className="text-lg font-medium text-text-primary mb-4">Reset Password</h3>
+        <h3 className="text-title text-text-primary mb-4">Reset Password</h3>
         <Form
           form={forgotPasswordForm}
           name="forgot-password"
@@ -185,7 +185,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             <Button
               type="link"
               onClick={() => setShowForgotPassword(true)}
-              className="!pl-0 text-sm text-primary hover:!text-primary-hover"
+              className="!pl-0 text-meta text-primary hover:!text-primary-hover"
             >
               Forgot Password?
             </Button>

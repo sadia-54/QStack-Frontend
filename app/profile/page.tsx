@@ -197,7 +197,7 @@ export default function ProfilePage() {
               <div className="text-2xl font-semibold text-text-primary">
                 {profile?.total_votes || 0}
               </div>
-              <div className="text-sm text-text-muted">Reputation</div>
+              <div className="text-meta text-text-muted">Reputation</div>
             </div>
           </div>
         </Card>
@@ -211,7 +211,7 @@ export default function ProfilePage() {
               <div className="text-2xl font-semibold text-text-primary">
                 {profile?.total_questions || 0}
               </div>
-              <div className="text-sm text-text-muted">Questions</div>
+              <div className="text-meta text-text-muted">Questions</div>
             </div>
           </div>
         </Card>
@@ -225,7 +225,7 @@ export default function ProfilePage() {
               <div className="text-2xl font-semibold text-text-primary">
                 {profile?.total_answers || 0}
               </div>
-              <div className="text-sm text-text-muted">Answers</div>
+              <div className="text-meta text-text-muted">Answers</div>
             </div>
           </div>
         </Card>
@@ -233,7 +233,7 @@ export default function ProfilePage() {
 
       {/* Preferred Tags */}
       <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-primary/50 transition">
-        <h3 className="text-lg font-semibold mb-4 text-text-primary">Preferred Tags</h3>
+        <h3 className="text-title mb-4 text-text-primary">Preferred Tags</h3>
         {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {profile.preferred_tags.map((tag) => (
@@ -246,7 +246,7 @@ export default function ProfilePage() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-text-muted">No preferred tags set</p>
+          <p className="text-meta text-text-muted">No preferred tags set</p>
         )}
       </Card>
     </div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
 
     return (
       <Card className="bg-surface !rounded-xl !border-border-soft">
-        <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
+        <h3 className="text-title mb-4 text-text-primary flex items-center gap-2">
           <ClockCircleOutlined />
           Recent Activity
         </h3>
@@ -295,9 +295,9 @@ export default function ProfilePage() {
                   description={
                     <div className="space-y-1">
                       {item.title && (
-                        <p className="!text-text-secondary text-sm">{item.title}</p>
+                        <p className="!text-text-secondary text-meta">{item.title}</p>
                       )}
-                      <p className="!text-text-muted text-xs">
+                      <p className="!text-text-muted text-meta">
                         {formatRelativeTime(item.created_at)}
                       </p>
                     </div>
@@ -351,7 +351,7 @@ export default function ProfilePage() {
                     }
                     description={
                       <div className="space-y-2">
-                        <div className="flex items-center gap-4 text-xs text-text-muted">
+                        <div className="flex items-center gap-4 text-meta text-text-muted">
                           <span className="flex items-center gap-1">
                             <ThunderboltOutlined className="text-warning" />
                             {item.vote_count} votes
@@ -369,7 +369,7 @@ export default function ProfilePage() {
                           {item.tags.map((tag) => (
                             <Tag
                               key={tag}
-                              className="!bg-hover-bg !border-border-soft !text-text-secondary !text-xs"
+                              className="!bg-hover-bg !border-border-soft !text-text-secondary !text-meta"
                             >
                               {tag}
                             </Tag>
@@ -479,7 +479,7 @@ export default function ProfilePage() {
 
       {/* Account Info */}
       <Card className="bg-surface !rounded-xl !border-border-soft">
-        <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
+        <h3 className="text-title mb-4 text-text-primary flex items-center gap-2">
           <UserOutlined />
           Account Information
         </h3>
@@ -487,7 +487,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <UnlockOutlined className="text-text-muted" />
             <div>
-              <p className="text-sm text-text-secondary">Username</p>
+              <p className="text-meta text-text-secondary">Username</p>
               <p className="text-text-primary">{profile?.username}</p>
             </div>
           </div>
@@ -495,7 +495,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <MailOutlined className="text-text-muted" />
             <div>
-              <p className="text-sm text-text-secondary">Email</p>
+              <p className="text-meta text-text-secondary">Email</p>
               <p className="text-text-primary">{userEmail || "N/A"}</p>
             </div>
           </div>
@@ -503,7 +503,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <ClockCircleOutlined className="text-text-muted" />
             <div>
-              <p className="text-sm text-text-secondary">Member Since</p>
+              <p className="text-meta text-text-secondary">Member Since</p>
               <p className="text-text-primary">
                 {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "N/A"}
               </p>
@@ -588,23 +588,23 @@ export default function ProfilePage() {
                 <h1 className="text-2xl font-semibold text-text-primary">
                   {profile?.username || "User"}
                 </h1>
-                <p className="text-sm text-text-muted flex items-center gap-2 mt-1">
+                <p className="text-meta text-text-muted flex items-center gap-2 mt-1">
                   <MailOutlined />
                   {userEmail || "user@example.com"}
                 </p>
                 {profile?.bio && (
-                  <p className="text-sm text-text-secondary mt-3 line-clamp-2">{profile.bio}</p>
+                  <p className="text-base text-text-secondary mt-3 line-clamp-2">{profile.bio}</p>
                 )}
                 <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
                     <StarOutlined className="text-warning" />
                     <span>{profile?.total_votes || 0} reputation</span>
                   </div>
-                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
                     <ThunderboltOutlined className="text-primary" />
                     <span>{profile?.total_questions || 0} questions</span>
                   </div>
-                  <div className="flex items-center gap-1 text-text-muted text-sm">
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
                     <MessageOutlined className="text-success" />
                     <span>{profile?.total_answers || 0} answers</span>
                   </div>
@@ -663,7 +663,7 @@ export default function ProfilePage() {
         >
           <Space direction="vertical" className="w-full mt-4">
             <div>
-              <label className="text-text-secondary text-sm mb-2 block">Bio</label>
+              <label className="text-text-secondary text-meta mb-2 block">Bio</label>
               <TextArea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}

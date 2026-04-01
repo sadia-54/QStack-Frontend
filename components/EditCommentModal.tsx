@@ -41,7 +41,7 @@ export default function EditCommentModal({
       className="dark-modal"
     >
       <div className="text-text-primary">
-        <h2 className="text-xl font-semibold mb-4 text-text-primary">Edit Comment</h2>
+        <h2 className="text-title mb-4 text-text-primary">Edit Comment</h2>
 
         <Input.TextArea
           value={body}

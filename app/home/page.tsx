@@ -251,11 +251,6 @@ export default function HomePage() {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    router.push("/");
-  };
-
   if (loading) {
     return (
       <AuthGuard>
@@ -290,8 +285,8 @@ export default function HomePage() {
                 <UserOutlined />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-text-primary">Welcome to QStack</h1>
-                <p className="text-sm text-text-muted">Your developer Q&A community</p>
+                <h1 className="text-3xl font-semibold text-text-primary">Welcome to QStack</h1>
+                <p className="text-meta text-text-muted">Your developer Q&A community</p>
               </div>
             </div>
 
@@ -338,11 +333,11 @@ export default function HomePage() {
                     >
                       <div className="flex items-start gap-4">
                         <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                          <div className="text-sm text-gray-200/60 flex items-center gap-1">
+                          <div className="text-meta text-text-muted flex items-center gap-1">
                             <ThunderboltOutlined className="text-yellow-400" />
                             {q.vote_count}
                           </div>
-                          <div className="text-sm text-gray-200/60 flex items-center gap-1">
+                          <div className="text-meta text-text-muted flex items-center gap-1">
                             <MessageOutlined />
                             {q.answer_count}
                           </div>
@@ -350,7 +345,7 @@ export default function HomePage() {
 
                         <div className="flex-1">
                           <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-lg font-medium text-text-primary hover:text-primary transition flex-1">
+                            <h3 className="text-title text-text-primary hover:text-primary transition flex-1">
                               {q.title}
                             </h3>
                             {isOwner && (
@@ -375,7 +370,7 @@ export default function HomePage() {
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-200/60">
+                          <div className="flex items-center gap-2 mt-2 text-meta text-text-muted">
                             <UserOutlined className="text-text-secondary" />
                             <span>{q.author.username}</span>
                             <span className="text-gray-200/30">•</span>
@@ -402,7 +397,7 @@ export default function HomePage() {
 
               {paginatedQuestions.length === 0 && !loading && (
                 <div className="glass !rounded-2xl !text-white p-8 text-center">
-                  <div className="text-gray-200/60 text-lg">
+                  <div className="text-text-muted text-base">
                     {hasActiveFilters
                       ? "No questions match your filters. Try adjusting your search."
                       : "No questions yet. Be the first to ask!"}
@@ -431,7 +426,7 @@ export default function HomePage() {
               <Card
                 className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
               >
-                <h3 className="text-lg font-semibold mb-4 text-text-primary">Popular Tags</h3>
+                <h3 className="text-title mb-4 text-text-primary">Popular Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {popularTags.slice(0, 15).map((tag) => (
                     <Tag
@@ -449,8 +444,8 @@ export default function HomePage() {
               <Card
                 className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
               >
-                <h3 className="text-lg font-semibold mb-4 text-text-primary">Community</h3>
-                <div className="space-y-3 text-sm">
+                <h3 className="text-title mb-4 text-text-primary">Community</h3>
+                <div className="space-y-3 text-meta">
                   <div className="flex justify-between">
                     <span className="text-text-muted">Members</span>
                     <span className="text-text-primary">{communityStats?.total_users.toLocaleString() || "0"}</span>
@@ -471,7 +466,7 @@ export default function HomePage() {
                 className="bg-surface !rounded-2xl !text-white hover:!border-accent transition"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-text-primary">FAQ</h3>
+                  <h3 className="text-title text-text-primary">FAQ</h3>
                   <Button
                     type="text"
                     size="small"
@@ -493,14 +488,14 @@ export default function HomePage() {
                       <span className="text-white font-semibold">{faq.q}</span>
                     ),
                     children: (
-                      <div className="text-text-secondary text-sm leading-relaxed pl-2">
+                      <div className="text-text-secondary text-base leading-relaxed pl-2">
                         {faq.a}
                       </div>
                     ),
                     className: "!border-border-soft last:!border-0",
                     expandIcon: ({ isActive }: { isActive: boolean }) => (
-                      isActive 
-                        ? <MinusCircleOutlined className="text-white" /> 
+                      isActive
+                        ? <MinusCircleOutlined className="text-white" />
                         : <PlusCircleOutlined className="text-text-muted" />
                     ),
                   }))}

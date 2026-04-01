@@ -95,7 +95,7 @@ export default function Feed() {
           <div className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-text-primary">My Feed</h1>
-              <p className="text-sm text-text-muted mt-1">
+              <p className="text-meta text-text-muted mt-1">
                 Personalized questions based on your interests
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function Feed() {
           {/* Trending Tags */}
           <div className="mb-6 flex items-center gap-2">
             <FireOutlined className="text-warning" />
-            <span className="text-text-muted text-sm">Trending:</span>
+            <span className="text-meta text-text-muted">Trending:</span>
             <div className="flex flex-wrap gap-2">
               {["javascript", "react", "typescript", "nodejs", "python"].map((tag) => (
                 <Tag
@@ -149,22 +149,22 @@ export default function Feed() {
               >
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                    <div className="text-sm text-text-muted flex items-center gap-1">
+                    <div className="text-meta text-text-muted flex items-center gap-1">
                       <UpOutlined className="text-warning" />
                       {q.vote_count}
                     </div>
-                    <div className="text-sm text-text-muted flex items-center gap-1">
+                    <div className="text-meta text-text-muted flex items-center gap-1">
                       <MessageOutlined />
                       {q.answer_count}
                     </div>
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="text-lg font-medium text-text-primary hover:text-primary transition">
+                    <h3 className="text-title text-text-primary hover:text-primary transition">
                       {q.title}
                     </h3>
 
-                    <div className="flex items-center gap-2 mt-2 text-sm text-text-muted">
+                    <div className="flex items-center gap-2 mt-2 text-meta text-text-muted">
                       <UserOutlined className="text-primary" />
                       <span>{q.author.username}</span>
                       <span className="text-text-muted">•</span>
@@ -190,10 +190,10 @@ export default function Feed() {
 
           {filteredQuestions.length === 0 && !isLoading && (
             <div className="bg-surface !rounded-2xl !text-white p-8 text-center">
-              <div className="text-text-muted text-lg">
+              <div className="text-text-muted text-base">
                 {searchTerm ? "No questions match your search" : "No questions in your feed yet"}
               </div>
-              <p className="text-sm text-text-muted mt-2">
+              <p className="text-meta text-text-muted mt-2">
                 {searchTerm ? "Try a different search term" : "Start asking questions or voting on tags to build your feed"}
               </p>
             </div>

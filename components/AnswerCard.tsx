@@ -95,7 +95,7 @@ export default function AnswerCard({
         {answer.is_accepted && (
           <div className="w-[80px] bg-success/10 flex flex-col items-center justify-start py-6 gap-2 rounded-l-2xl flex-shrink-0">
             <CheckCircleOutlined className="text-success text-3xl" />
-            <span className="text-xs text-text-secondary uppercase tracking-wide text-center px-2">
+            <span className="text-meta text-text-secondary uppercase tracking-wide text-center px-2">
               Accepted
             </span>
           </div>
@@ -120,7 +120,7 @@ export default function AnswerCard({
               <h3 className="text-base font-medium text-text-primary truncate group-hover:text-primary transition-colors">
                 {answerTitle || "Answer"}
               </h3>
-              <div className="flex items-center gap-2 text-xs text-text-muted mt-1">
+              <div className="flex items-center gap-2 text-meta text-text-muted mt-1">
                 <UserOutlined />
                 <span className="truncate">{answer.author?.username || "Unknown"}</span>
                 <span className="text-text-muted">•</span>
@@ -128,7 +128,7 @@ export default function AnswerCard({
                 <span>{formatDate(answer.created_at)}</span>
               </div>
             </div>
-            <div className="text-xs text-text-muted group-hover:text-text-secondary transition-colors flex-shrink-0">
+            <div className="text-meta text-text-muted group-hover:text-text-secondary transition-colors flex-shrink-0">
               {isExpanded ? "Collapse" : "Click to expand"}
             </div>
           </div>
@@ -146,10 +146,10 @@ export default function AnswerCard({
 
               {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-border-soft">
-                <div className="flex items-center gap-3 text-sm text-text-muted">
+                <div className="flex items-center gap-3 text-meta text-text-muted">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
-                      <UserOutlined className="text-primary text-xs" />
+                      <UserOutlined className="text-primary text-meta" />
                     </div>
                     <span>{answer.author?.username || "Unknown"}</span>
                   </div>

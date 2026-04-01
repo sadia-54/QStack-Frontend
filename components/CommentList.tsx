@@ -33,21 +33,21 @@ export default function CommentList({ comments, currentUserId, onDelete, onEdit 
 
   return (
     <div className="space-y-2 mt-4 pt-4 border-t border-border-soft">
-      <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
+      <div className="text-meta text-text-muted uppercase tracking-wide mb-2">
         {comments.length} {comments.length === 1 ? "Comment" : "Comments"}
       </div>
       {comments.map((comment) => (
         <div
           key={comment.id}
-          className="flex items-start gap-2 text-sm group"
+          className="flex items-start gap-2 text-meta group"
         >
           <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
-            <UserOutlined className="text-primary text-xs" />
+            <UserOutlined className="text-primary text-meta" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-text-primary">{comment.author.username}</span>
-              <span className="text-text-muted text-xs">{formatDate(comment.created_at)}</span>
+              <span className="text-text-muted text-meta">{formatDate(comment.created_at)}</span>
             </div>
             <div className="text-text-secondary break-words mt-1">{comment.body}</div>
           </div>

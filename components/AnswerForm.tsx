@@ -30,7 +30,7 @@ export default function AnswerForm({
 
   return (
     <div className="bg-surface !rounded-2xl !text-white p-6 border border-border-soft">
-      <h3 className="text-xl font-semibold text-text-primary mb-4">Your Answer</h3>
+      <h3 className="text-title text-text-primary mb-4">Your Answer</h3>
 
       <RichTextEditor
         value={description}

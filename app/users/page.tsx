@@ -85,7 +85,7 @@ export default function Users() {
           {/* Header */}
           <div className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8">
             <h1 className="text-2xl font-semibold text-text-primary">Community Members</h1>
-            <p className="text-sm text-text-muted mt-1">
+            <p className="text-meta text-text-muted mt-1">
               Connect with {users.length} developers from around the world
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function Users() {
           </div>
 
           {/* Users Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
             {sortedUsers.map((user) => (
               <Card
                 key={user.id}
@@ -127,11 +127,11 @@ export default function Users() {
                     className="!bg-hover-bg !border-2 !border-primary/30 flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-medium text-text-primary hover:text-primary transition truncate">
+                    <h3 className="text-title text-text-primary hover:text-primary transition truncate">
                       {user.username}
                     </h3>
 
-                    <div className="flex items-center gap-3 mt-2 text-xs text-text-muted">
+                    <div className="flex items-center gap-3 mt-2 text-meta text-text-muted">
                       <div className="flex items-center gap-1">
                         <ThunderboltOutlined className="text-warning" />
                         <span>{user.total_votes}</span>
@@ -157,7 +157,7 @@ export default function Users() {
 
           {sortedUsers.length === 0 && (
             <div className="bg-surface !rounded-2xl !text-white p-8 text-center">
-              <div className="text-text-muted text-lg">
+              <div className="text-text-muted text-base">
                 {searchTerm ? "No users match your search" : "No users yet"}
               </div>
             </div>

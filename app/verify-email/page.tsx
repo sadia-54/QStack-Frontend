@@ -27,5 +27,5 @@ export default function VerifyEmailPage() {
       .catch(() => setMessage("Verification failed"));
   }, []);
 
-  return <div style={{ padding: 20, fontSize: 18 }}>{message}</div>;
+  return <div className="p-5 text-title">{message}</div>;
 }

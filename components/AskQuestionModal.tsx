@@ -103,7 +103,7 @@ export default function AskQuestionModal({
       title={
         <div>
           <EditOutlined className="text-primary" />
-          <span className="text-xl font-semibold text-text-primary">Ask Question</span>
+          <span className="text-title text-text-primary">Ask Question</span>
         </div>
       }
     >

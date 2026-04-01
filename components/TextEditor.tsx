@@ -79,7 +79,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           <b>B</b>
         </button>
@@ -87,7 +87,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           <i>I</i>
         </button>
@@ -95,7 +95,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           {"</>"}
         </button>
@@ -103,7 +103,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           H2
         </button>
@@ -111,7 +111,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           • List
         </button>
@@ -119,12 +119,12 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           1. List
         </button>
 
-        <label className="px-3 py-1 text-sm rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition cursor-pointer">
+        <label className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition cursor-pointer">
           Image
           <input
             type="file"

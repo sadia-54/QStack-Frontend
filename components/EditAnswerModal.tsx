@@ -42,7 +42,7 @@ export default function EditAnswerModal({
       className="dark-modal"
     >
       <div className="text-text-primary">
-        <h2 className="text-xl font-semibold mb-4 text-text-primary">Edit Your Answer</h2>
+        <h2 className="text-title mb-4 text-text-primary">Edit Your Answer</h2>
 
         <RichTextEditor
           value={description}

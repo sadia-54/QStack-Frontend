@@ -72,7 +72,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
               icon={<UserOutlined />}
               className="!bg-hover-bg !border-2 !border-primary/30 mb-4"
             />
-            <h2 className="text-xl font-semibold text-text-primary mb-2">
+            <h2 className="text-title text-text-primary mb-2">
               {profile.username}
             </h2>
 
@@ -86,7 +86,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <ThunderboltOutlined className="text-warning" />
-                  <span className="text-sm">Reputation</span>
+                  <span className="text-meta">Reputation</span>
                 </div>
                 <span className="text-lg font-medium text-text-primary">
                   {profile.total_votes}
@@ -95,7 +95,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <MessageOutlined className="text-primary" />
-                  <span className="text-sm">Questions</span>
+                  <span className="text-meta">Questions</span>
                 </div>
                 <span className="text-lg font-medium text-text-primary">
                   {profile.total_questions}
@@ -104,7 +104,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <StarOutlined className="text-success" />
-                  <span className="text-sm">Answers</span>
+                  <span className="text-meta">Answers</span>
                 </div>
                 <span className="text-lg font-medium text-text-primary">
                   {profile.total_answers}
@@ -115,7 +115,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
             {/* Preferred Tags */}
             {profile.preferred_tags && profile.preferred_tags.length > 0 && (
               <div className="mb-6">
-                <p className="text-sm text-text-muted mb-2 text-center">Preferred Tags</p>
+                <p className="text-meta text-text-muted mb-2 text-center">Preferred Tags</p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {profile.preferred_tags.map((tag, index) => (
                     <Tag

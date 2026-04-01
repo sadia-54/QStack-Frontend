@@ -140,7 +140,7 @@ body {
 
 .sidebar-menu .ant-menu-title-content {
   color: var(--color-text-primary) !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
 /* ============================================
@@ -256,7 +256,7 @@ body {
 /* Buttons */
 .ant-btn {
   border-radius: 6px !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
 }
 
 /* Cards */
