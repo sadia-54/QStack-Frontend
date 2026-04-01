@@ -382,7 +382,7 @@ export default function QuestionDetail() {
       <div className="glow -top-60 -left-60 bg-primary/20" />
       <div className="glow -bottom-60 -right-60 bg-primary/10" />
 
-      <div className="relative z-10 mx-auto max-w-[900px]">
+      <div className="relative z-10 mx-auto w-full max-w-[calc(100vw-2rem)]">
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => router.push("/home")}
@@ -391,167 +391,175 @@ export default function QuestionDetail() {
           Back to Home
         </Button>
 
-        {/* Question Card */}
-        <Card
-          className="bg-surface !rounded-2xl !text-white !border-0 mb-6"
-          styles={{ body: { padding: 0 } }}
-        >
-          <div className="flex">
-            <div className="w-[80px] bg-hover-bg flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
-              <div className="flex flex-col items-center gap-2">
-                <Button
-                  type="text"
-                  size="large"
-                  icon={<UpOutlined className={`text-2xl ${userVote === 1 ? 'text-success' : 'text-text-muted hover:text-success'}`} />}
-                  onClick={() => handleVote(1)}
-                  disabled={!isAuthenticated}
-                  className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                  title={isAuthenticated ? "Upvote" : "Login to vote"}
-                />
-                <span className="text-2xl font-bold text-text-primary">
-                  {question.vote_count}
-                </span>
-                <Button
-                  type="text"
-                  size="large"
-                  icon={<DownOutlined className={`text-2xl ${userVote === -1 ? 'text-error' : 'text-text-muted hover:text-error'}`} />}
-                  onClick={() => handleVote(-1)}
-                  disabled={!isAuthenticated}
-                  className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                  title={isAuthenticated ? "Downvote" : "Login to vote"}
-                />
-                <span className="text-meta text-text-muted uppercase tracking-wide">votes</span>
-              </div>
-              <div className="w-8 h-px bg-border" />
-              <div className="flex flex-col items-center">
-                <MessageOutlined className="text-primary text-2xl mb-1" />
-                <span className="text-2xl font-bold text-text-primary">
-                  {question.answer_count}
-                </span>
-                <span className="text-meta text-text-muted uppercase tracking-wide">answers</span>
-              </div>
-            </div>
-
-            <div className="flex-1 p-6 min-w-0">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-2xl font-semibold text-text-primary break-words flex-1">
-                  {question.title}
-                </h1>
-                {isQuestionOwner && (
-                  <div className="flex gap-2 flex-shrink-0">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* Left Column - Question Details & Answers */}
+          <div className="col-span-7">
+            {/* Question Card */}
+            <Card
+              className="bg-surface !rounded-2xl !text-white !border-0 mb-6"
+              styles={{ body: { padding: 0 } }}
+            >
+              <div className="flex">
+                <div className="w-[80px] bg-hover-bg flex flex-col items-center py-6 gap-4 rounded-l-2xl flex-shrink-0">
+                  <div className="flex flex-col items-center gap-2">
                     <Button
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={handleEditQuestionClick}
-                      className="!bg-selected-bg !border-primary/30 !text-text-primary hover:!bg-hover-bg"
-                    >
-                      Edit
-                    </Button>
+                      type="text"
+                      size="large"
+                      icon={<UpOutlined className={`text-2xl ${userVote === 1 ? 'text-success' : 'text-text-muted hover:text-success'}`} />}
+                      onClick={() => handleVote(1)}
+                      disabled={!isAuthenticated}
+                      className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                      title={isAuthenticated ? "Upvote" : "Login to vote"}
+                    />
+                    <span className="text-2xl font-bold text-text-primary">
+                      {question.vote_count}
+                    </span>
                     <Button
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={handleDeleteQuestion}
-                      className="!bg-error/20 !border-error/30 !text-text-primary hover:!bg-error/30"
-                    >
-                      Delete
-                    </Button>
+                      type="text"
+                      size="large"
+                      icon={<DownOutlined className={`text-2xl ${userVote === -1 ? 'text-error' : 'text-text-muted hover:text-error'}`} />}
+                      onClick={() => handleVote(-1)}
+                      disabled={!isAuthenticated}
+                      className={`!p-2 ${!isAuthenticated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                      title={isAuthenticated ? "Downvote" : "Login to vote"}
+                    />
+                    <span className="text-meta text-text-muted uppercase tracking-wide">votes</span>
                   </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3 text-meta text-text-muted mb-4 pb-4 border-b border-border-soft">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
-                    <UserOutlined className="text-primary text-meta" />
+                  <div className="w-8 h-px bg-border" />
+                  <div className="flex flex-col items-center">
+                    <MessageOutlined className="text-primary text-2xl mb-1" />
+                    <span className="text-2xl font-bold text-text-primary">
+                      {question.answer_count}
+                    </span>
+                    <span className="text-meta text-text-muted uppercase tracking-wide">answers</span>
                   </div>
-                  <span>{question.author.username}</span>
                 </div>
-                <span className="text-text-muted">•</span>
-                <div className="flex items-center gap-2">
-                  <ClockCircleOutlined className="text-primary" />
-                  <span>asked {formatDate(question.created_at)}</span>
+
+                <div className="flex-1 p-6 min-w-0">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <h1 className="text-2xl font-semibold text-text-primary break-words flex-1">
+                      {question.title}
+                    </h1>
+                    {isQuestionOwner && (
+                      <div className="flex gap-2 flex-shrink-0">
+                        <Button
+                          size="small"
+                          icon={<EditOutlined />}
+                          onClick={handleEditQuestionClick}
+                          className="!bg-selected-bg !border-primary/30 !text-text-primary hover:!bg-hover-bg"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="small"
+                          icon={<DeleteOutlined />}
+                          onClick={handleDeleteQuestion}
+                          className="!bg-error/20 !border-error/30 !text-text-primary hover:!bg-error/30"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 text-meta text-text-muted mb-4 pb-4 border-b border-border-soft">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
+                        <UserOutlined className="text-primary text-meta" />
+                      </div>
+                      <span>{question.author.username}</span>
+                    </div>
+                    <span className="text-text-muted">•</span>
+                    <div className="flex items-center gap-2">
+                      <ClockCircleOutlined className="text-primary" />
+                      <span>asked {formatDate(question.created_at)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {question.tags && question.tags.length > 0 ? (
+                      question.tags.map((tag) => (
+                        <Tag
+                          key={tag}
+                          className="!bg-hover-bg !border-border-soft !text-text-secondary !text-meta !px-3 !py-1"
+                        >
+                          {tag}
+                        </Tag>
+                      ))
+                    ) : null}
+                  </div>
+
+                  <div
+                    className="ProseMirror text-text-secondary max-w-none"
+                    dangerouslySetInnerHTML={{ __html: question.description }}
+                  />
                 </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {question.tags && question.tags.length > 0 ? (
-                  question.tags.map((tag) => (
-                    <Tag
-                      key={tag}
-                      className="!bg-hover-bg !border-border-soft !text-text-secondary !text-meta !px-3 !py-1"
-                    >
-                      {tag}
-                    </Tag>
-                  ))
-                ) : null}
-              </div>
-
-              <div
-                className="ProseMirror text-text-secondary max-w-none"
-                dangerouslySetInnerHTML={{ __html: question.description }}
-              />
-            </div>
-          </div>
-        </Card>
-
-        {/* Answers Section */}
-        <div className="mb-6">
-          <h2 className="text-title mb-4 text-text-primary">
-            {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
-          </h2>
-
-          {/* Answer List */}
-          {answers.length > 0 ? (
-            <div className="space-y-4 mb-6">
-              {answers.map((answer) => (
-                <AnswerCard
-                  key={answer.id}
-                  answer={answer}
-                  isQuestionOwner={isQuestionOwner}
-                  isAnswerOwner={currentUserIdNum ? answer.author.id === currentUserIdNum : false}
-                  currentUserId={currentUserIdNum}
-                  isAuthenticated={isAuthenticated}
-                  comments={commentsByAnswer[answer.id] || []}
-                  showComments={!!expandedComments[answer.id]}
-                  onAccept={handleAcceptAnswer}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteAnswer}
-                  onAddComment={(body) => handleAddComment(answer.id, body)}
-                  onEditComment={(comment) => handleEditCommentClick(comment)}
-                  onDeleteComment={(commentId) => handleDeleteComment(answer.id, commentId)}
-                  onToggleComments={() => toggleComments(answer.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <Card className="bg-surface !rounded-2xl !text-white p-8 text-center mb-6">
-              <div className="text-text-muted text-lg">
-                No answers yet. Be the first to answer!
               </div>
             </Card>
-          )}
-        </div>
 
-        {/* Answer Form */}
-        {isAuthenticated ? (
-          <AnswerForm
-            onSubmit={handleCreateAnswer}
-            isSubmitting={submitting}
-          />
-        ) : (
-          <Card className="bg-surface !rounded-2xl !text-white p-8 text-center">
-            <div className="text-text-muted mb-4">
-              Please log in to post an answer
+            {/* Answers Section */}
+            <div className="mb-6">
+              <h2 className="text-title mb-4 text-text-primary">
+                {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
+              </h2>
+
+              {/* Answer List */}
+              {answers.length > 0 ? (
+                <div className="space-y-4 mb-6">
+                  {answers.map((answer) => (
+                    <AnswerCard
+                      key={answer.id}
+                      answer={answer}
+                      isQuestionOwner={isQuestionOwner}
+                      isAnswerOwner={currentUserIdNum ? answer.author.id === currentUserIdNum : false}
+                      currentUserId={currentUserIdNum}
+                      isAuthenticated={isAuthenticated}
+                      comments={commentsByAnswer[answer.id] || []}
+                      showComments={!!expandedComments[answer.id]}
+                      onAccept={handleAcceptAnswer}
+                      onEdit={handleEditClick}
+                      onDelete={handleDeleteAnswer}
+                      onAddComment={(body) => handleAddComment(answer.id, body)}
+                      onEditComment={(comment) => handleEditCommentClick(comment)}
+                      onDeleteComment={(commentId) => handleDeleteComment(answer.id, commentId)}
+                      onToggleComments={() => toggleComments(answer.id)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="bg-surface !rounded-2xl !text-white p-8 text-center mb-6">
+                  <div className="text-text-muted text-lg">
+                    No answers yet. Be the first to answer!
+                  </div>
+                </Card>
+              )}
             </div>
-            <Button
-              type="primary"
-              onClick={() => router.push("/")}
-              className="btn-gradient"
-            >
-              Log In
-            </Button>
-          </Card>
-        )}
+          </div>
+
+          {/* Right Column - Submit Answer Form */}
+          <div className="col-span-5">
+            {isAuthenticated ? (
+              <AnswerForm
+                onSubmit={handleCreateAnswer}
+                isSubmitting={submitting}
+              />
+            ) : (
+              <Card className="bg-surface !rounded-2xl !text-white p-8 text-center">
+                <div className="text-text-muted mb-4">
+                  Please log in to post an answer
+                </div>
+                <Button
+                  type="primary"
+                  onClick={() => router.push("/")}
+                  className="btn-gradient"
+                >
+                  Log In
+                </Button>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Edit Answer Modal */}
