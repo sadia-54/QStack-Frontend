@@ -8,6 +8,17 @@ export interface User {
   reputation?: number;
 }
 
+// For public user listing (community members)
+export interface UserSummaryPublic {
+  id: number;
+  username: string;
+  bio: string;
+  total_questions: number;
+  total_answers: number;
+  total_votes: number;
+  created_at: string;
+}
+
 export interface Profile {
   id: number;
   username: string;

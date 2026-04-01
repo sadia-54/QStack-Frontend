@@ -1,29 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, Avatar, Tag, Input, Select } from "antd";
-import {
-  UserOutlined,
-  SearchOutlined,
-  ThunderboltOutlined,
-  MessageOutlined,
-  StarOutlined,
-} from "@ant-design/icons";
-import { getUsers } from "@/api/user";
-import { User } from "@/types/user";
+import { UserOutlined, SearchOutlined, ThunderboltOutlined, MessageOutlined, StarOutlined } from "@ant-design/icons";
+import { getCommunityMembers } from "@/api/user";
+import { UserSummaryPublic } from "@/types/user";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
+import UserProfileModal from "@/components/UserProfileModal";
 
 const { Option } = Select;
 
 export default function Users() {
-  const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserSummaryPublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const filteredUsers = users.filter((user) =>
@@ -43,10 +38,10 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const data = await getUsers();
+      const data = await getCommunityMembers();
       setUsers(data);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch community members:", error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +52,13 @@ export default function Users() {
   }, []);
 
   const handleUserClick = (id: number) => {
-    router.push(`/profile/${id}`);
+    setSelectedUserId(id);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUserId(null);
   };
 
   if (loading) {
@@ -85,7 +86,7 @@ export default function Users() {
           <div className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8">
             <h1 className="text-2xl font-semibold text-text-primary">Community Members</h1>
             <p className="text-sm text-text-muted mt-1">
-              Connect with developers from around the world
+              Connect with {users.length} developers from around the world
             </p>
           </div>
 
@@ -119,37 +120,36 @@ export default function Users() {
                 className="bg-surface !rounded-2xl !text-white hover:!border-accent transition cursor-pointer"
                 onClick={() => handleUserClick(user.id)}
               >
-                <div className="flex flex-col items-center text-center p-4">
+                <div className="flex gap-4">
                   <Avatar
-                    size={64}
+                    size={56}
                     icon={<UserOutlined />}
-                    className="!bg-hover-bg !border-2 !border-primary/30 mb-4"
+                    className="!bg-hover-bg !border-2 !border-primary/30 flex-shrink-0"
                   />
-                  <h3 className="text-lg font-medium text-text-primary hover:text-primary transition">
-                    {user.username}
-                  </h3>
-                  <p className="text-sm text-text-muted mt-1">
-                    {user.email}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-medium text-text-primary hover:text-primary transition truncate">
+                      {user.username}
+                    </h3>
 
-                  <div className="flex items-center gap-4 mt-4 text-sm text-text-muted">
-                    <div className="flex items-center gap-1">
-                      <ThunderboltOutlined className="text-warning" />
-                      <span>0</span>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-text-muted">
+                      <div className="flex items-center gap-1">
+                        <ThunderboltOutlined className="text-warning" />
+                        <span>{user.total_votes}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageOutlined className="text-primary" />
+                        <span>{user.total_questions}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <StarOutlined className="text-success" />
+                        <span>{user.total_answers}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <MessageOutlined className="text-primary" />
-                      <span>0</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <StarOutlined className="text-success" />
-                      <span>0</span>
-                    </div>
+
+                    <Tag className="!bg-hover-bg !border-border-soft !text-text-secondary mt-2">
+                      Member
+                    </Tag>
                   </div>
-
-                  <Tag className="!bg-hover-bg !border-border-soft !text-text-secondary mt-4">
-                    Member
-                  </Tag>
                 </div>
               </Card>
             ))}
@@ -163,6 +163,13 @@ export default function Users() {
             </div>
           )}
         </div>
+
+        {/* User Profile Modal */}
+        <UserProfileModal
+          open={isModalOpen}
+          userId={selectedUserId}
+          onClose={handleCloseModal}
+        />
       </div>
     </AuthGuard>
   );

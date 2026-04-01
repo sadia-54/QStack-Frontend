@@ -1,34 +1,35 @@
-import { User, Profile, ActivityItem } from "@/types/user";
+import { User, Profile, ActivityItem, UserSummaryPublic } from "@/types/user";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const getUsers = async (): Promise<User[]> => {
-  const response = await fetch(`${BASE_URL}/users/`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch users");
-  }
-  return response.json();
-};
-
-export const getUserById = async (id: number): Promise<User> => {
-  const response = await fetch(`${BASE_URL}/users/${id}/`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch user");
-  }
-  return response.json();
-};
-
-export const getProfile = async (userId: number): Promise<Profile> => {
-  const response = await fetch(`${BASE_URL}/users/${userId}/profile`, {
+// Get all community members (public user listing)
+export const getCommunityMembers = async (): Promise<UserSummaryPublic[]> => {
+  const response = await fetch(`${BASE_URL}/users`, {
     headers: {
       "Content-Type": "application/json",
     },
   });
   if (!response.ok) {
-    throw new Error("Failed to fetch profile");
+    throw new Error("Failed to fetch community members");
   }
   return response.json();
 };
+
+// Get public profile by user ID
+export const getUserProfile = async (id: number): Promise<Profile> => {
+  const response = await fetch(`${BASE_URL}/users/${id}/profile`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch user profile");
+  }
+  return response.json();
+};
+
+// Alias for backward compatibility
+export const getProfile = getUserProfile;
 
 export const updateProfile = async (bio: string): Promise<{ message: string }> => {
   const token = localStorage.getItem("access_token");
