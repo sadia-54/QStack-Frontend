@@ -19,9 +19,11 @@ import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, 
 import AskQuestionModal from "@/components/AskQuestionModal";
 import FilterToolbar from "@/components/FilterToolbar";
 import EditQuestionModal from "@/components/EditQuestionModal";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
+import { fetchProfile } from "@/store/user/userThunks";
+import { Avatar } from "antd";
 
 const PAGE_SIZE = 5;
 const DEBOUNCE_DELAY = 500; // ms
@@ -58,6 +60,8 @@ function HomePageContent() {
   const searchParams = useSearchParams();
   const { message } = App.useApp();
   const { isAuthenticated, currentUserId } = useSelector((state: RootState) => state.auth);
+  const { profile } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +89,13 @@ function HomePageContent() {
       setSort(urlSort);
     }
   }, [searchParams]);
+
+  // Fetch user profile on mount to get profile image
+  useEffect(() => {
+    if (currentUserId) {
+      dispatch(fetchProfile(currentUserId));
+    }
+  }, [dispatch, currentUserId]);
 
   // Update URL query params when filters change
   useEffect(() => {
@@ -283,9 +294,12 @@ function HomePageContent() {
           {/* Dashboard Welcome Header */}
           <header className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-hover-bg border border-border flex items-center justify-center text-primary text-xl">
-                <UserOutlined />
-              </div>
+              <Avatar
+                size={64}
+                src={profile?.profile_image}
+                icon={<UserOutlined />}
+                className="!bg-surface-elevated !border-2 !border-primary/30"
+              />
               <div>
                 <h1 className="text-3xl font-semibold text-text-primary">Welcome to QStack</h1>
                 <p className="text-meta text-text-muted">Your developer Q&A community</p>

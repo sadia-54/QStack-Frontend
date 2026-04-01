@@ -4,6 +4,7 @@ export interface User {
   email: string;
   created_at: string;
   avatar_url?: string;
+  profile_image?: string;
   bio?: string;
   reputation?: number;
 }
@@ -17,6 +18,7 @@ export interface UserSummaryPublic {
   total_answers: number;
   total_votes: number;
   created_at: string;
+  profile_image?: string;
 }
 
 export interface Profile {
@@ -28,6 +30,7 @@ export interface Profile {
   total_votes: number;
   preferred_tags?: string[];
   created_at?: string;
+  profile_image?: string;
 }
 
 export interface ActivityItem {

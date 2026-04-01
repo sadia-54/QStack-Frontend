@@ -1,6 +1,8 @@
 import { User, Profile, ActivityItem, UserSummaryPublic } from "@/types/user";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Extract base server URL without the /api/v1 prefix for static assets
+const SERVER_BASE_URL = BASE_URL?.replace('/api/v1', '') || '';
 
 // Get all community members (public user listing)
 export const getCommunityMembers = async (): Promise<UserSummaryPublic[]> => {
@@ -25,7 +27,12 @@ export const getUserProfile = async (id: number): Promise<Profile> => {
   if (!response.ok) {
     throw new Error("Failed to fetch user profile");
   }
-  return response.json();
+  const data = await response.json();
+  // Ensure the profile_image URL is absolute (using server base URL for static assets)
+  if (data.profile_image && !data.profile_image.startsWith('http')) {
+    data.profile_image = `${SERVER_BASE_URL}${data.profile_image}`;
+  }
+  return data;
 };
 
 // Alias for backward compatibility
@@ -91,5 +98,31 @@ export const getMyProfile = async (): Promise<User> => {
     const data = await response.json();
     throw new Error(data.error || "Failed to fetch profile");
   }
-  return response.json();
+  const data = await response.json();
+  // Ensure the profile_image URL is absolute (using server base URL for static assets)
+  if (data.profile_image && !data.profile_image.startsWith('http')) {
+    data.profile_image = `${SERVER_BASE_URL}${data.profile_image}`;
+  }
+  return data;
+};
+
+export const uploadProfileImage = async (file: File): Promise<{ profile_image: string }> => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${BASE_URL}/users/profile/image`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to upload profile image");
+  }
+  const data = await response.json();
+  // Ensure the profile_image URL is absolute (using server base URL for static assets)
+  if (data.profile_image && !data.profile_image.startsWith('http')) {
+    data.profile_image = `${SERVER_BASE_URL}${data.profile_image}`;
+  }
+  return data;
 };

@@ -69,6 +69,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
             {/* Avatar & Username */}
             <Avatar
               size={80}
+              src={profile.profile_image}
               icon={<UserOutlined />}
               className="!bg-hover-bg !border-2 !border-primary/30 mb-4"
             />

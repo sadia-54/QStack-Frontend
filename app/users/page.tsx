@@ -120,6 +120,7 @@ export default function Users() {
                 <div className="flex gap-4">
                   <Avatar
                     size={56}
+                    src={user.profile_image}
                     icon={<UserOutlined />}
                     className="!bg-hover-bg !border-2 !border-primary/30 flex-shrink-0"
                   />
