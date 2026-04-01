@@ -5,8 +5,6 @@ import { Card, Avatar, Tag, Input, Select } from "antd";
 import { UserOutlined, SearchOutlined, ThunderboltOutlined, MessageOutlined, StarOutlined } from "@ant-design/icons";
 import { getCommunityMembers } from "@/api/user";
 import { UserSummaryPublic } from "@/types/user";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
 import UserProfileModal from "@/components/UserProfileModal";
 
@@ -19,7 +17,6 @@ export default function Users() {
   const [sortBy, setSortBy] = useState("newest");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())

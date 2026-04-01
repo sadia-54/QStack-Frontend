@@ -14,7 +14,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { getQuestionById, updateQuestion, deleteQuestion, voteQuestion } from "@/api/question";
-import { Question } from "@/types/question";
+import { Question, CreateQuestionRequest } from "@/types/question";
 import { Answer } from "@/types/answer";
 import {
   getAnswersByQuestion,
@@ -61,7 +61,6 @@ export default function QuestionDetail() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [isEditQuestionModalOpen, setIsEditQuestionModalOpen] = useState(false);
-  const [updatingQuestion, setUpdatingQuestion] = useState(false);
   const [commentsByAnswer, setCommentsByAnswer] = useState<Record<number, Comment[]>>({});
   const [expandedComments, setExpandedComments] = useState<Record<number, boolean>>({});
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
@@ -148,6 +147,7 @@ export default function QuestionDetail() {
       setLoading(false);
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionId]);
 
   const handleCreateAnswer = async (description: string) => {
@@ -163,8 +163,9 @@ export default function QuestionDetail() {
       message.success("Answer posted successfully!");
       await fetchAnswers();
       await fetchQuestion();
-    } catch (error: any) {
-      message.error(error.message || "Failed to post answer");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to post answer";
+      message.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -180,8 +181,9 @@ export default function QuestionDetail() {
       setIsEditModalOpen(false);
       setEditingAnswer(null);
       await fetchAnswers();
-    } catch (error: any) {
-      message.error(error.message || "Failed to update answer");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update answer";
+      message.error(errorMessage);
     } finally {
       setUpdating(false);
     }
@@ -195,8 +197,9 @@ export default function QuestionDetail() {
       message.success("Answer deleted successfully!");
       await fetchAnswers();
       await fetchQuestion();
-    } catch (error: any) {
-      message.error(error.message || "Failed to delete answer");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete answer";
+      message.error(errorMessage);
     }
   };
 
@@ -207,8 +210,9 @@ export default function QuestionDetail() {
       await acceptAnswer(answerId, accessToken);
       message.success("Answer accepted!");
       await fetchAnswers();
-    } catch (error: any) {
-      message.error(error.message || "Failed to accept answer");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to accept answer";
+      message.error(errorMessage);
     }
   };
 
@@ -221,19 +225,18 @@ export default function QuestionDetail() {
     setIsEditQuestionModalOpen(true);
   };
 
-  const handleUpdateQuestion = async (data: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
     if (!question || !accessToken) return;
 
-    setUpdatingQuestion(true);
     try {
       await updateQuestion(question.id, data, accessToken);
       message.success("Question updated successfully!");
       setIsEditQuestionModalOpen(false);
       await fetchQuestion();
-    } catch (error: any) {
-      message.error(error.message || "Failed to update question");
-    } finally {
-      setUpdatingQuestion(false);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update question";
+      message.error(errorMessage);
     }
   };
 
@@ -243,9 +246,10 @@ export default function QuestionDetail() {
     try {
       await deleteQuestion(question.id, accessToken);
       message.success("Question deleted successfully!");
-      router.push("/question");
-    } catch (error: any) {
-      message.error(error.message || "Failed to delete question");
+      router.push("/home");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete question";
+      message.error(errorMessage);
     }
   };
 
@@ -259,8 +263,9 @@ export default function QuestionDetail() {
       await createComment(answerId, { body }, accessToken);
       message.success("Comment added!");
       await fetchComments(answerId);
-    } catch (error: any) {
-      message.error(error.message || "Failed to add comment");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to add comment";
+      message.error(errorMessage);
     }
   };
 
@@ -271,8 +276,9 @@ export default function QuestionDetail() {
       await deleteComment(commentId, accessToken);
       message.success("Comment deleted!");
       await fetchComments(answerId);
-    } catch (error: any) {
-      message.error(error.message || "Failed to delete comment");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete comment";
+      message.error(errorMessage);
     }
   };
 
@@ -296,8 +302,9 @@ export default function QuestionDetail() {
           .filter((id) => expandedComments[parseInt(id)])
           .map((id) => fetchComments(parseInt(id)))
       );
-    } catch (error: any) {
-      message.error(error.message || "Failed to update comment");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update comment";
+      message.error(errorMessage);
     } finally {
       setUpdatingComment(false);
     }
@@ -331,8 +338,9 @@ export default function QuestionDetail() {
       }
 
       message.success("Vote recorded!");
-    } catch (error: any) {
-      message.error(error.message || "Failed to vote");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to vote";
+      message.error(errorMessage);
     }
   };
 
@@ -527,7 +535,6 @@ export default function QuestionDetail() {
         {/* Answer Form */}
         {isAuthenticated ? (
           <AnswerForm
-            questionId={questionId}
             onSubmit={handleCreateAnswer}
             isSubmitting={submitting}
           />

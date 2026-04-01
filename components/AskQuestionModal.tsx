@@ -38,11 +38,11 @@ export default function AskQuestionModal({
     }
 
     // Transform tags string to array (form provides string, API expects array)
-    const tagsInput = (values as any).tags as string;
+    const tagsInput = typeof values.tags === "string" ? values.tags : (values.tags as string[])?.[0] || "";
     const tagsArray = tagsInput
       .split(/[,\s]+/)
-      .map((tag: string) => tag.trim())
-      .filter((tag: string) => tag.length > 0);
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
 
     setLoading(true);
 
@@ -130,7 +130,7 @@ export default function AskQuestionModal({
             styles={{
               input: {
                 color: "var(--color-text-primary)",
-                ["::placeholder" as any]: {
+                ["::placeholder" as unknown as string]: {
                   color: "var(--color-text-muted)",
                 },
               },
@@ -166,7 +166,7 @@ export default function AskQuestionModal({
             styles={{
               input: {
                 color: "var(--color-text-primary)",
-                ["::placeholder" as any]: {
+                ["::placeholder" as unknown as string]: {
                   color: "var(--color-text-muted)",
                 },
               },

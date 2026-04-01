@@ -1,20 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Tag, Button, Pagination, Spin, App, Collapse } from "antd";
-import type { CollapseProps } from "antd";
 import {
   ThunderboltOutlined,
-  FireOutlined,
   MessageOutlined,
-  StarOutlined,
   UserOutlined,
   ClockCircleOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  LogoutOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
@@ -23,9 +19,8 @@ import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, 
 import AskQuestionModal from "@/components/AskQuestionModal";
 import FilterToolbar from "@/components/FilterToolbar";
 import EditQuestionModal from "@/components/EditQuestionModal";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/store";
-import { logoutUser } from "@/store/auth/authThunks";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
 
 const PAGE_SIZE = 5;
@@ -58,10 +53,9 @@ const faqs = [
   }
 ];
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const dispatch = useDispatch<AppDispatch>();
   const { message } = App.useApp();
   const { isAuthenticated, currentUserId, accessToken } = useSelector((state: RootState) => state.auth);
 
@@ -102,6 +96,7 @@ export default function HomePage() {
     const queryString = params.toString();
     const newPath = queryString ? `/home?${queryString}` : "/home";
     router.replace(newPath, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, tag, sort]);
 
   const hasActiveFilters = search !== "" || tag !== "" || sort !== "newest";
@@ -160,6 +155,7 @@ export default function HomePage() {
     }, DEBOUNCE_DELAY);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, tag, sort]);
 
   useEffect(() => {
@@ -225,6 +221,7 @@ export default function HomePage() {
     setIsEditModalOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
     if (!editingQuestion || !accessToken) return;
 
@@ -234,8 +231,9 @@ export default function HomePage() {
       setIsEditModalOpen(false);
       setEditingQuestion(null);
       await fetchQuestions();
-    } catch (error: any) {
-      message.error(error.message || "Failed to update question");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update question";
+      message.error(errorMessage);
     }
   };
 
@@ -246,8 +244,9 @@ export default function HomePage() {
       await deleteQuestion(id, accessToken);
       message.success("Question deleted successfully!");
       await fetchQuestions();
-    } catch (error: any) {
-      message.error(error.message || "Failed to delete question");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete question";
+      message.error(errorMessage);
     }
   };
 
@@ -522,5 +521,21 @@ export default function HomePage() {
         onSuccess={fetchQuestions}
       />
     </AuthGuard>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="relative starry min-h-screen px-4 py-6">
+        <div className="glow -top-60 -left-60 bg-accent/40" />
+        <div className="glow -bottom-60 -right-60 bg-accent/40" />
+        <div className="relative z-10 mx-auto max-w-[1400px] flex items-center justify-center min-h-[60vh]">
+          <Spin size="large" className="text-text-muted" />
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }

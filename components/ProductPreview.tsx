@@ -35,7 +35,7 @@ export default function ProductPreview() {
               Best practices for setting up CI/CD pipelines in a microservices architecture?
             </div>
             <div className="text-meta text-text-secondary mt-1">
-              I'm using Go + Next.js + PostgreSQL… what's the cleanest deployment approach?
+              I&apos;m using Go + Next.js + PostgreSQL… what&apos;s the cleanest deployment approach?
             </div>
           </div>
 

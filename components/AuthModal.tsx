@@ -24,7 +24,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ open, onClose }: AuthModalProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [showForgotPassword, setShowForgotPassword] = useState(false);

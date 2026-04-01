@@ -121,7 +121,7 @@ export default function ProfilePage() {
       await dispatch(updateUserProfile(bio));
       message.success("Profile updated successfully");
       setIsEditModalOpen(false);
-    } catch (_err) {
+    } catch {
       message.error("Failed to update profile");
     }
   };
@@ -158,7 +158,7 @@ export default function ProfilePage() {
       await dispatch(updateUserPassword(values.currentPassword, values.newPassword));
       message.success("Password changed successfully");
       passwordForm.resetFields();
-    } catch (_err) {
+    } catch {
       // Error already handled in thunk
     }
   };

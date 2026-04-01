@@ -1,24 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Modal } from "antd";
+import { Button } from "antd";
 import { SendOutlined, CloseOutlined } from "@ant-design/icons";
 import RichTextEditor from "./TextEditor";
 
 interface Props {
-  questionId: number;
   onSubmit: (description: string) => Promise<void>;
   onCancel?: () => void;
   isSubmitting?: boolean;
-  placeholder?: string;
 }
 
 export default function AnswerForm({
-  questionId,
   onSubmit,
   onCancel,
   isSubmitting = false,
-  placeholder = "Write your answer here...",
 }: Props) {
   const [description, setDescription] = useState("");
 

@@ -12,7 +12,6 @@ import {
   FireOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { Question } from "@/types/question";
 import AskQuestionModal from "@/components/AskQuestionModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
@@ -22,7 +21,7 @@ import { fetchMyFeed, clearFeed } from "@/store/question/questionFeedSlice";
 export default function Feed() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { questions, isLoading, hasMore } = useSelector(
+  const { questions, isLoading } = useSelector(
     (state: RootState) => state.questionFeed
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -56,6 +55,7 @@ export default function Feed() {
 
   useEffect(() => {
     fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const handleOpenModal = () => {

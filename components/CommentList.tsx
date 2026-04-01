@@ -1,7 +1,7 @@
 "use client";
 
 import { Comment } from "@/types/comment";
-import { UserOutlined, ClockCircleOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { UserOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 
 interface Props {

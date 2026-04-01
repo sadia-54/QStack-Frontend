@@ -14,7 +14,6 @@ import {
 import HeroPreview from "@/components/HeroPreview";
 import ProductPreview from "@/components/ProductPreview";
 import AuthModal from "@/components/AuthModal";
-import { useRouter } from "next/navigation";
 
 const features = [
   { title: "Structured Q&A", desc: "Ask technical questions with tags.", icon: CompassOutlined },
@@ -25,9 +24,8 @@ const features = [
   { title: "Developer Friendly", desc: "Markdown support + clean UX.", icon: CodeOutlined },
 ];
 
-export default function Home() {
+export default function Landing() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <main className="relative starry min-h-screen px-2 py-4">

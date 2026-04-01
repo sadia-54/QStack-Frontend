@@ -44,7 +44,7 @@ export default function FilterToolbar({
             styles={{
               input: {
                 color: "var(--color-text-primary)",
-                ["::placeholder" as any]: { color: "var(--color-text-muted)" },
+                ["::placeholder" as unknown as string]: { color: "var(--color-text-muted)" },
               },
             }}
           />

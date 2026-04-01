@@ -1,12 +1,12 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import { Form, Input, Button, message } from "antd";
+import { useState, Suspense } from "react";
+import { Form, Input, Button, message, Spin } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { resetPasswordApi } from "@/api/auth";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token");
@@ -94,5 +94,17 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
