@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, Tag, Button, App } from "antd";
+import { Card, Tag, Button, App, Modal } from "antd";
 import {
   MessageOutlined,
   UserOutlined,
@@ -66,6 +66,8 @@ export default function QuestionDetail() {
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [isEditCommentModalOpen, setIsEditCommentModalOpen] = useState(false);
   const [updatingComment, setUpdatingComment] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'question' | 'answer' | 'comment'; id: number; answerId?: number } | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const questionId = params.id ? parseInt(params.id as string) : 0;
 
@@ -191,16 +193,8 @@ export default function QuestionDetail() {
 
   const handleDeleteAnswer = async (answerId: number) => {
     if (!isAuthenticated) return;
-
-    try {
-      await deleteAnswer(answerId);
-      message.success("Answer deleted successfully!");
-      await fetchAnswers();
-      await fetchQuestion();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete answer";
-      message.error(errorMessage);
-    }
+    setDeleteTarget({ type: 'answer', id: answerId });
+    setIsDeleteModalOpen(true);
   };
 
   const handleAcceptAnswer = async (answerId: number) => {
@@ -242,15 +236,8 @@ export default function QuestionDetail() {
 
   const handleDeleteQuestion = async () => {
     if (!question || !isAuthenticated) return;
-
-    try {
-      await deleteQuestion(question.id);
-      message.success("Question deleted successfully!");
-      router.push("/home");
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete question";
-      message.error(errorMessage);
-    }
+    setDeleteTarget({ type: 'question', id: question.id });
+    setIsDeleteModalOpen(true);
   };
 
   const handleAddComment = async (answerId: number, body: string) => {
@@ -271,15 +258,8 @@ export default function QuestionDetail() {
 
   const handleDeleteComment = async (answerId: number, commentId: number) => {
     if (!isAuthenticated) return;
-
-    try {
-      await deleteComment(commentId);
-      message.success("Comment deleted!");
-      await fetchComments(answerId);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete comment";
-      message.error(errorMessage);
-    }
+    setDeleteTarget({ type: 'comment', id: commentId, answerId });
+    setIsDeleteModalOpen(true);
   };
 
   const handleEditCommentClick = (comment: Comment) => {
@@ -340,6 +320,34 @@ export default function QuestionDetail() {
       message.success("Vote recorded!");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to vote";
+      message.error(errorMessage);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget || !isAuthenticated) return;
+
+    try {
+      if (deleteTarget.type === 'question') {
+        await deleteQuestion(deleteTarget.id);
+        message.success("Question deleted successfully!");
+        router.push("/home");
+      } else if (deleteTarget.type === 'answer') {
+        await deleteAnswer(deleteTarget.id);
+        message.success("Answer deleted successfully!");
+        await fetchAnswers();
+        await fetchQuestion();
+      } else if (deleteTarget.type === 'comment') {
+        await deleteComment(deleteTarget.id);
+        message.success("Comment deleted!");
+        if (deleteTarget.answerId) {
+          await fetchComments(deleteTarget.answerId);
+        }
+      }
+      setIsDeleteModalOpen(false);
+      setDeleteTarget(null);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : `Failed to delete ${deleteTarget.type}`;
       message.error(errorMessage);
     }
   };
@@ -595,6 +603,43 @@ export default function QuestionDetail() {
         onSubmit={handleUpdateComment}
         isSubmitting={updatingComment}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-3">
+            <DeleteOutlined className="text-error text-xl" />
+            <span>Confirm Delete</span>
+          </div>
+        }
+        open={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTarget(null);
+        }}
+        onOk={handleConfirmDelete}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTarget(null);
+        }}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+        centered
+        className="!text-white"
+      >
+        <div className="text-text-secondary py-4">
+          {deleteTarget?.type === 'question' && (
+            <p>Are you sure you want to delete this question? This action cannot be undone.</p>
+          )}
+          {deleteTarget?.type === 'answer' && (
+            <p>Are you sure you want to delete this answer? This action cannot be undone.</p>
+          )}
+          {deleteTarget?.type === 'comment' && (
+            <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
