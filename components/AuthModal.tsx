@@ -48,13 +48,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       const response = await loginApi(values);
       dispatch(
         loginSuccess({
-          accessToken: response.access_token,
-          refreshToken: response.refresh_token,
+          accessToken: "cookie",
+          refreshToken: "cookie",
         })
       );
-      localStorage.setItem("access_token", response.access_token);
-      localStorage.setItem("refresh_token", response.refresh_token);
-      message.success("Login successful!");
+      message.success(response.message || "Login successful!");
       signInForm.resetFields();
       onClose();
       router.push("/home");

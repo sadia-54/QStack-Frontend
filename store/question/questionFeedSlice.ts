@@ -25,12 +25,9 @@ export const fetchMyFeed = createAsyncThunk<
   Question[],
   { limit?: number; offset?: number },
   { state: RootState; dispatch: AppDispatch }
->("questionFeed/fetchMyFeed", async (params, { getState, rejectWithValue }) => {
+>("questionFeed/fetchMyFeed", async (params, { rejectWithValue }) => {
   try {
-    const state = getState();
-    const accessToken = state.auth.accessToken;
-
-    const data = await getMyFeedApi(params, accessToken);
+    const data = await getMyFeedApi(params);
     return data;
   } catch (error: any) {
     return rejectWithValue(error.message || "Failed to fetch feed");
@@ -61,18 +58,23 @@ const questionFeedSlice = createSlice({
       })
       .addCase(fetchMyFeed.fulfilled, (state, action) => {
         state.isLoading = false;
-        
+
         if (action.payload.length < state.limit) {
           state.hasMore = false;
         }
-        
+
+        // Deduplicate questions by id
+        const newQuestions = action.payload.filter(
+          (newQ) => !state.questions.some((existingQ) => existingQ.id === newQ.id)
+        );
+
         if (state.offset === 0) {
           state.questions = action.payload;
         } else {
-          state.questions = [...state.questions, ...action.payload];
+          state.questions = [...state.questions, ...newQuestions];
         }
-        
-        state.offset += action.payload.length;
+
+        state.offset += newQuestions.length;
       })
       .addCase(fetchMyFeed.rejected, (state, action) => {
         state.isLoading = false;

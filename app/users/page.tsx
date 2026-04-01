@@ -102,7 +102,7 @@ export default function Users() {
               onChange={setSortBy}
               size="large"
               className="!w-[200px]"
-              popupClassName="!bg-surface-elevated !border"
+              classNames={{ popup: { root: "!bg-surface-elevated !border" } }}
             >
               <Option value="newest" className="!text-text-primary">Newest</Option>
               <Option value="oldest" className="!text-text-primary">Oldest</Option>

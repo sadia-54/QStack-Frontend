@@ -28,9 +28,10 @@ export default function Feed() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filteredQuestions = questions.filter((q) =>
-    q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    q.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredQuestions = questions.filter((q, index, self) =>
+    (q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    q.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+    self.findIndex(item => item.id === q.id) === index
   );
 
   const formatDate = (dateString: string) => {

@@ -16,15 +16,14 @@ export const getCommentsByAnswer = async (answerId: number): Promise<Comment[]> 
 
 export const createComment = async (
   answerId: number,
-  payload: CreateCommentRequest,
-  accessToken: string
+  payload: CreateCommentRequest
 ) => {
   const res = await fetch(`${BASE_URL}/comments/answer/${answerId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -39,15 +38,14 @@ export const createComment = async (
 
 export const updateComment = async (
   commentId: number,
-  payload: UpdateCommentRequest,
-  accessToken: string
+  payload: UpdateCommentRequest
 ) => {
   const res = await fetch(`${BASE_URL}/comments/${commentId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -60,12 +58,10 @@ export const updateComment = async (
   return data;
 };
 
-export const deleteComment = async (commentId: number, accessToken: string) => {
+export const deleteComment = async (commentId: number) => {
   const res = await fetch(`${BASE_URL}/comments/${commentId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   });
 
   if (!res.ok) {

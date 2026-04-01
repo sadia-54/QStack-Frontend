@@ -24,10 +24,10 @@ export default function AskQuestionModal({
   const [description, setDescription] = useState("");
   const [form] = Form.useForm();
 
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (values: CreateQuestionRequest) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       message.error("Please login to ask a question");
       return;
     }
@@ -52,8 +52,7 @@ export default function AskQuestionModal({
           ...values,
           description,
           tags: tagsArray,
-        },
-        accessToken
+        }
       );
 
       message.success("Question posted successfully!");

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Avatar, Space, Tag, Tabs, Form, Input, Button, message, List, Typography, Divider, Modal, Pagination } from "antd";
+import { Card, Avatar, Space, Tag, Tabs, Form, Input, Button, message, Typography, Divider, Modal, Pagination } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -82,7 +82,7 @@ const formatRelativeTime = (dateString: string) => {
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { currentUserId } = useSelector((state: RootState) => state.auth);
+  const { currentUserId, isInitializing } = useSelector((state: RootState) => state.auth);
   const { profile, activities, isLoading, error, userEmail } = useSelector((state: RootState) => state.user);
   const { questions: myQuestions, isLoading: isQuestionsLoading } = useSelector((state: RootState) => state.myQuestions);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -111,6 +111,19 @@ export default function ProfilePage() {
       message.error(error);
     }
   }, [error]);
+
+  // Show loading while auth is initializing
+  if (isInitializing) {
+    return (
+      <AuthGuard>
+        <div className="relative starry min-h-screen px-4 py-6">
+          <div className="flex items-center justify-center h-full">
+            <p className="text-text-muted">Loading...</p>
+          </div>
+        </div>
+      </AuthGuard>
+    );
+  }
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -270,42 +283,35 @@ export default function ProfilePage() {
             <p className="text-text-muted">No activity yet</p>
           </div>
         ) : (
-          <List
-            dataSource={sortedActivities}
-            renderItem={(item) => (
-              <List.Item className="!border-border-soft hover:!bg-hover-bg transition px-4 py-3 rounded-lg">
-                <List.Item.Meta
-                  avatar={
-                    <div className="h-10 w-10 rounded-lg bg-surface-elevated flex items-center justify-center text-lg">
-                      {getActivityIcon(item.type)}
-                    </div>
-                  }
-                  title={
-                    <div className="flex items-center gap-2">
-                      <Text className="!text-text-primary font-medium">
-                        {getActivityLabel(item.type)}
-                      </Text>
-                      {item.value !== undefined && item.value !== 0 && (
-                        <Tag className="!bg-primary/20 !border-primary/30 !text-primary">
-                          {item.value > 0 ? `+${item.value}` : item.value}
-                        </Tag>
-                      )}
-                    </div>
-                  }
-                  description={
-                    <div className="space-y-1">
-                      {item.title && (
-                        <p className="!text-text-secondary text-meta">{item.title}</p>
-                      )}
-                      <p className="!text-text-muted text-meta">
-                        {formatRelativeTime(item.created_at)}
-                      </p>
-                    </div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
+          <div className="space-y-2">
+            {sortedActivities.map((item, index) => (
+              <div key={`${item.target_id || ''}-${item.created_at}-${index}`} className="!border-border-soft hover:!bg-hover-bg transition px-4 py-3 rounded-lg flex items-start gap-4">
+                <div className="h-10 w-10 rounded-lg bg-surface-elevated flex items-center justify-center text-lg flex-shrink-0">
+                  {getActivityIcon(item.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Text className="!text-text-primary font-medium">
+                      {getActivityLabel(item.type)}
+                    </Text>
+                    {item.value !== undefined && item.value !== 0 && (
+                      <Tag className="!bg-primary/20 !border-primary/30 !text-primary">
+                        {item.value > 0 ? `+${item.value}` : item.value}
+                      </Tag>
+                    )}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {item.title && (
+                      <p className="!text-text-secondary text-meta">{item.title}</p>
+                    )}
+                    <p className="!text-text-muted text-meta">
+                      {formatRelativeTime(item.created_at)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </Card>
     );
@@ -321,7 +327,7 @@ export default function ProfilePage() {
 
     return (
       <Card className="bg-surface !rounded-xl !border-border-soft">
-      
+
         {isQuestionsLoading && myQuestions.length === 0 ? (
           <div className="text-center py-12">
             <ClockCircleOutlined className="text-4xl text-text-muted mb-3" />
@@ -334,24 +340,22 @@ export default function ProfilePage() {
           </div>
         ) : (
           <>
-            <List
-              dataSource={paginatedQuestions}
-              renderItem={(item: Question) => (
-                <List.Item
+            <div className="space-y-2">
+              {paginatedQuestions.map((item: Question) => (
+                <div
+                  key={item.id}
                   className="!border-border-soft hover:!bg-hover-bg transition px-4 py-3 rounded-lg cursor-pointer"
                   onClick={() => handleQuestionClick(item.id)}
                 >
-                  <List.Item.Meta
-                    title={
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <Text className="!text-text-primary font-medium">
                           {item.title}
                         </Text>
                       </div>
-                    }
-                    description={
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-4 text-meta text-text-muted">
+                      <div className="space-y-2 mt-1">
+                        <div className="flex items-center gap-4 text-meta text-text-muted flex-wrap">
                           <span className="flex items-center gap-1">
                             <ThunderboltOutlined className="text-warning" />
                             {item.vote_count} votes
@@ -376,11 +380,11 @@ export default function ProfilePage() {
                           ))}
                         </div>
                       </div>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
             {totalPages > 1 && (
               <div className="flex justify-center mt-8">
                 <Pagination
@@ -635,7 +639,7 @@ export default function ProfilePage() {
             }}
             items={tabItems}
             className="!text-white"
-            destroyInactiveTabPane={true}
+            destroyOnHidden={true}
           />
         </div>
 

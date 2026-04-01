@@ -26,20 +26,20 @@ export default function EditQuestionModal({
   const [description, setDescription] = useState("");
   const [form] = Form.useForm();
 
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (question) {
+    if (question && open) {
       form.setFieldsValue({
         title: question.title,
         tags: question.tags?.join(", "),
       });
       setDescription(question.description);
     }
-  }, [question, form]);
+  }, [question, open, form]);
 
   const handleSubmit = async (values: CreateQuestionRequest) => {
-    if (!accessToken || !question) {
+    if (!isAuthenticated || !question) {
       message.error("Authentication required");
       return;
     }
@@ -64,8 +64,7 @@ export default function EditQuestionModal({
           ...values,
           description,
           tags: tagsArray,
-        },
-        accessToken
+        }
       );
 
       message.success("Question updated successfully!");

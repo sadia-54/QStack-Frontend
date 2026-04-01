@@ -49,7 +49,7 @@ export default function QuestionDetail() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { message } = App.useApp();
-  const { isAuthenticated, accessToken, currentUserId } = useSelector(
+  const { isAuthenticated, currentUserId } = useSelector(
     (state: RootState) => state.auth
   );
   const { userVotes } = useSelector((state: RootState) => state.questionVote);
@@ -151,7 +151,7 @@ export default function QuestionDetail() {
   }, [questionId]);
 
   const handleCreateAnswer = async (description: string) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       message.error("Please login to post an answer");
       router.push("/");
       return;
@@ -159,7 +159,7 @@ export default function QuestionDetail() {
 
     setSubmitting(true);
     try {
-      await createAnswer(questionId, { description }, accessToken);
+      await createAnswer(questionId, { description });
       message.success("Answer posted successfully!");
       await fetchAnswers();
       await fetchQuestion();
@@ -172,11 +172,11 @@ export default function QuestionDetail() {
   };
 
   const handleUpdateAnswer = async (description: string) => {
-    if (!editingAnswer || !accessToken) return;
+    if (!editingAnswer || !isAuthenticated) return;
 
     setUpdating(true);
     try {
-      await updateAnswer(editingAnswer.id, { description }, accessToken);
+      await updateAnswer(editingAnswer.id, { description });
       message.success("Answer updated successfully!");
       setIsEditModalOpen(false);
       setEditingAnswer(null);
@@ -190,10 +190,10 @@ export default function QuestionDetail() {
   };
 
   const handleDeleteAnswer = async (answerId: number) => {
-    if (!accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
-      await deleteAnswer(answerId, accessToken);
+      await deleteAnswer(answerId);
       message.success("Answer deleted successfully!");
       await fetchAnswers();
       await fetchQuestion();
@@ -204,10 +204,10 @@ export default function QuestionDetail() {
   };
 
   const handleAcceptAnswer = async (answerId: number) => {
-    if (!accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
-      await acceptAnswer(answerId, accessToken);
+      await acceptAnswer(answerId);
       message.success("Answer accepted!");
       await fetchAnswers();
     } catch (error) {
@@ -227,10 +227,10 @@ export default function QuestionDetail() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
-    if (!question || !accessToken) return;
+    if (!question || !isAuthenticated) return;
 
     try {
-      await updateQuestion(question.id, data, accessToken);
+      await updateQuestion(question.id, data);
       message.success("Question updated successfully!");
       setIsEditQuestionModalOpen(false);
       await fetchQuestion();
@@ -241,10 +241,10 @@ export default function QuestionDetail() {
   };
 
   const handleDeleteQuestion = async () => {
-    if (!question || !accessToken) return;
+    if (!question || !isAuthenticated) return;
 
     try {
-      await deleteQuestion(question.id, accessToken);
+      await deleteQuestion(question.id);
       message.success("Question deleted successfully!");
       router.push("/home");
     } catch (error) {
@@ -254,13 +254,13 @@ export default function QuestionDetail() {
   };
 
   const handleAddComment = async (answerId: number, body: string) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       message.error("Please login to comment");
       return;
     }
 
     try {
-      await createComment(answerId, { body }, accessToken);
+      await createComment(answerId, { body });
       message.success("Comment added!");
       await fetchComments(answerId);
     } catch (error) {
@@ -270,10 +270,10 @@ export default function QuestionDetail() {
   };
 
   const handleDeleteComment = async (answerId: number, commentId: number) => {
-    if (!accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
-      await deleteComment(commentId, accessToken);
+      await deleteComment(commentId);
       message.success("Comment deleted!");
       await fetchComments(answerId);
     } catch (error) {
@@ -288,11 +288,11 @@ export default function QuestionDetail() {
   };
 
   const handleUpdateComment = async (body: string) => {
-    if (!editingComment || !accessToken) return;
+    if (!editingComment || !isAuthenticated) return;
 
     setUpdatingComment(true);
     try {
-      await updateComment(editingComment.id, { body }, accessToken);
+      await updateComment(editingComment.id, { body });
       message.success("Comment updated!");
       setIsEditCommentModalOpen(false);
       setEditingComment(null);
@@ -311,7 +311,7 @@ export default function QuestionDetail() {
   };
 
   const handleVote = async (value: 1 | -1) => {
-    if (!question || !accessToken) {
+    if (!question || !isAuthenticated) {
       message.error("Please login to vote");
       router.push("/");
       return;
@@ -323,7 +323,7 @@ export default function QuestionDetail() {
     }
 
     try {
-      await voteQuestion(question.id, { value }, accessToken);
+      await voteQuestion(question.id, { value });
 
       // Update local vote state
       if (userVote === value) {

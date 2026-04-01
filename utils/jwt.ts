@@ -15,12 +15,8 @@ export const decodeJWT = (token: string): any => {
   }
 };
 
+// Note: With cookie-based auth, user ID should be fetched from the backend
+// This function is kept for backward compatibility but returns null
 export const getCurrentUserId = (): number | null => {
-  const token = localStorage.getItem("access_token");
-  if (!token) return null;
-
-  const decoded = decodeJWT(token);
-  // Try multiple common JWT claim names for user ID
-  const userId = decoded?.sub ?? decoded?.user_id ?? decoded?.userId ?? decoded?.id ?? null;
-  return userId ? Number(userId) : null;
+  return null;
 };

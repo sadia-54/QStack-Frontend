@@ -1,57 +1,80 @@
 import { AppDispatch } from "../index";
-import { loginSuccess, logout, setCurrentUserId } from "./authSlice";
+import { loginSuccess, logout, setCurrentUserId, authInitialized } from "./authSlice";
 import { loginApi } from "@/api/auth";
-import { decodeJWT } from "@/utils/jwt";
-
-const getUserIdFromToken = (token: string): number | null => {
-  const decoded = decodeJWT(token);
-  if (!decoded) return null;
-  // Try multiple common JWT claim names for user ID
-  const userId = decoded?.sub ?? decoded?.user_id ?? decoded?.userId ?? decoded?.id ?? null;
-  return userId ? Number(userId) : null;
-};
 
 export const loginUser =
   (identifier: string, password: string) =>
   async (dispatch: AppDispatch) => {
-    const data = await loginApi({ identifier, password });
+    await loginApi({ identifier, password });
 
-    // Decode JWT to get user ID
-    const userId = getUserIdFromToken(data.access_token);
+    // Fetch current user to get user ID from the authenticated session
+    const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    let userId: number | null = null;
+    if (userRes.ok) {
+      const user = await userRes.json();
+      userId = user.id ?? user.user_id ?? null;
+    }
 
     dispatch(
       loginSuccess({
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
+        accessToken: "cookie",
+        refreshToken: "cookie",
         userId: userId ?? undefined,
       })
     );
-
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
   };
 
 export const logoutUser =
-  () => (dispatch: AppDispatch) => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+  () => async (dispatch: AppDispatch) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      // Ignore errors, still clear local state
+    }
     dispatch(logout());
   };
 
 export const initializeAuth =
-  () => (dispatch: AppDispatch) => {
-    const accessToken = localStorage.getItem("access_token");
-    const refreshToken = localStorage.getItem("refresh_token");
+  () => async (dispatch: AppDispatch) => {
+    // Check if user is authenticated by fetching current user
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (accessToken && refreshToken) {
-      const userId = getUserIdFromToken(accessToken);
+      if (res.ok) {
+        const user = await res.json();
+        const userId = user.id ?? user.user_id ?? null;
 
-      dispatch(
-        loginSuccess({
-          accessToken,
-          refreshToken,
-          userId: userId ?? undefined,
-        })
-      );
+        dispatch(
+          loginSuccess({
+            accessToken: "cookie",
+            refreshToken: "cookie",
+            userId: userId ?? undefined,
+          })
+        );
+      }
+    } catch (err) {
+      // Not authenticated, leave state as is
+    } finally {
+      // Always mark initialization as complete
+      dispatch(authInitialized());
     }
   };

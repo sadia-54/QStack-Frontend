@@ -11,15 +11,17 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isInitializing } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only redirect if initialization is complete and user is not authenticated
+    if (!isInitializing && !isAuthenticated) {
       router.push("/");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isInitializing, router]);
 
-  if (!isAuthenticated) {
+  // Show nothing while initializing or if not authenticated
+  if (isInitializing || !isAuthenticated) {
     return null;
   }
 

@@ -32,13 +32,12 @@ export const getUserProfile = async (id: number): Promise<Profile> => {
 export const getProfile = getUserProfile;
 
 export const updateProfile = async (bio: string): Promise<{ message: string }> => {
-  const token = localStorage.getItem("access_token");
   const response = await fetch(`${BASE_URL}/users/profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ bio }),
   });
   if (!response.ok) {
@@ -49,12 +48,11 @@ export const updateProfile = async (bio: string): Promise<{ message: string }> =
 };
 
 export const getUserActivity = async (userId: number): Promise<ActivityItem[]> => {
-  const token = localStorage.getItem("access_token");
   const response = await fetch(`${BASE_URL}/users/${userId}/activity`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
   });
   if (!response.ok) {
     const data = await response.json();
@@ -67,13 +65,12 @@ export const changePassword = async (
   currentPassword: string,
   newPassword: string
 ): Promise<{ message: string }> => {
-  const token = localStorage.getItem("access_token");
   const response = await fetch(`${BASE_URL}/auth/change-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
   });
   if (!response.ok) {
@@ -84,12 +81,11 @@ export const changePassword = async (
 };
 
 export const getMyProfile = async (): Promise<User> => {
-  const token = localStorage.getItem("access_token");
   const response = await fetch(`${BASE_URL}/users/me`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
   });
   if (!response.ok) {
     const data = await response.json();

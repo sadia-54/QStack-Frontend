@@ -1,13 +1,14 @@
-import { LoginRequest, SignupRequest, AuthResponse, ForgotPasswordRequest } from "@/types/auth";
+import { LoginRequest, SignupRequest, ForgotPasswordRequest } from "@/types/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const loginApi = async (
   payload: LoginRequest
-): Promise<AuthResponse> => {
+): Promise<{ message: string }> => {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -26,6 +27,7 @@ export const signupApi = async (
   const res = await fetch(`${BASE_URL}/auth/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -44,6 +46,7 @@ export const forgotPasswordApi = async (
   const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -62,6 +65,7 @@ export const resetPasswordApi = async (
   const res = await fetch(`${BASE_URL}/auth/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 

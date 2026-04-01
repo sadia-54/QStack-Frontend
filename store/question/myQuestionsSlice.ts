@@ -25,12 +25,9 @@ export const fetchMyQuestions = createAsyncThunk<
   Question[],
   { limit?: number; offset?: number },
   { state: RootState; dispatch: AppDispatch }
->("myQuestions/fetchMyQuestions", async (params, { getState, rejectWithValue }) => {
+>("myQuestions/fetchMyQuestions", async (params, { rejectWithValue }) => {
   try {
-    const state = getState();
-    const accessToken = state.auth.accessToken;
-
-    const data = await getMyQuestionsApi(params, accessToken);
+    const data = await getMyQuestionsApi(params);
     return data;
   } catch (error: any) {
     return rejectWithValue(error.message || "Failed to fetch my questions");

@@ -134,8 +134,7 @@ export default function UserProfileModal({ open, userId, onClose }: UserProfileM
               <Descriptions
                 column={1}
                 size="small"
-                labelStyle={{ color: "var(--color-text-muted)" }}
-                contentStyle={{ color: "var(--color-text-secondary)" }}
+                styles={{ label: { color: "var(--color-text-muted)" }, content: { color: "var(--color-text-secondary)" } }}
               >
                 <Descriptions.Item label="Member since">
                   {formatDate(profile.created_at)}

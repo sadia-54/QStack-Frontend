@@ -57,7 +57,7 @@ function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { message } = App.useApp();
-  const { isAuthenticated, currentUserId, accessToken } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, currentUserId } = useSelector((state: RootState) => state.auth);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,7 +140,12 @@ function HomePageContent() {
         );
       }
 
-      setQuestions(fetchedQuestions);
+      // Deduplicate questions by id
+      const uniqueQuestions = fetchedQuestions.filter(
+        (q: Question, index: number, self: Question[]) => self.findIndex((item: Question) => item.id === q.id) === index
+      );
+
+      setQuestions(uniqueQuestions);
     } catch (error) {
       console.error(error);
       setQuestions([]);
@@ -223,10 +228,10 @@ function HomePageContent() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
-    if (!editingQuestion || !accessToken) return;
+    if (!editingQuestion) return;
 
     try {
-      await updateQuestion(editingQuestion.id, data, accessToken);
+      await updateQuestion(editingQuestion.id, data);
       message.success("Question updated successfully!");
       setIsEditModalOpen(false);
       setEditingQuestion(null);
@@ -238,10 +243,8 @@ function HomePageContent() {
   };
 
   const handleDeleteQuestion = async (id: number) => {
-    if (!accessToken) return;
-
     try {
-      await deleteQuestion(id, accessToken);
+      await deleteQuestion(id);
       message.success("Question deleted successfully!");
       await fetchQuestions();
     } catch (error) {
@@ -480,7 +483,7 @@ function HomePageContent() {
                   ghost
                   activeKey={expandedKeys}
                   onChange={(keys) => setExpandedKeys(keys as string[])}
-                  expandIconPosition="end"
+                  expandIconPlacement="end"
                   items={faqs.map((faq, index) => ({
                     key: index.toString(),
                     label: (
