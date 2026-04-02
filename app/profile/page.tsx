@@ -18,7 +18,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store";
-import AuthGuard from "@/components/AuthGuard";
+import { AuthGuard } from "@/components/auth";
 import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";
 import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
 import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/Profile";

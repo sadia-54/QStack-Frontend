@@ -14,8 +14,7 @@ import {
 import { Answer } from "@/types/answer";
 import { Comment } from "@/types/comment";
 import { useState } from "react";
-import CommentList from "../CommentList";
-import CommentForm from "../CommentForm";
+import { CommentList, CommentForm } from "@/components/comment";
 
 interface Props {
   answer: Answer;

@@ -5,8 +5,8 @@ import { Card, Avatar, Tag, Input, Select } from "antd";
 import { UserOutlined, SearchOutlined, ThunderboltOutlined, MessageOutlined, StarOutlined } from "@ant-design/icons";
 import { getCommunityMembers } from "@/api/user";
 import { UserSummaryPublic } from "@/types/user";
-import AuthGuard from "@/components/AuthGuard";
-import UserProfileModal from "@/components/UserProfileModal";
+import { AuthGuard } from "@/components/auth";
+import UserProfileModal from "@/components/users/UserProfileModal";
 
 const { Option } = Select;
 

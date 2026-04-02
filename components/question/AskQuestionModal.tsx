@@ -7,7 +7,7 @@ import { createQuestion } from "@/api/question";
 import { CreateQuestionRequest } from "@/types/question";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import RichTextEditor from "@/components/TextEditor";
+import RichTextEditor from "../common/TextEditor";
 
 interface AskQuestionModalProps {
   open: boolean;

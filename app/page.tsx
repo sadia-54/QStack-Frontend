@@ -11,9 +11,8 @@ import {
   CodeOutlined,
 } from "@ant-design/icons";
 
-import HeroPreview from "@/components/HeroPreview";
-import ProductPreview from "@/components/ProductPreview";
-import AuthModal from "@/components/AuthModal";
+import { HeroPreview, ProductPreview } from "@/components/landing";
+import { AuthModal } from "@/components/auth";
 
 const features = [
   { title: "Structured Q&A", desc: "Ask technical questions with tags.", icon: CompassOutlined },

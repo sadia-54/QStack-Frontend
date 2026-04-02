@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Modal, Button } from "antd";
-import RichTextEditor from "./TextEditor";
+import RichTextEditor from "../common/TextEditor";
 import { Answer } from "@/types/answer";
 
 interface Props {

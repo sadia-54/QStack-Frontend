@@ -12,10 +12,10 @@ import {
   FireOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import AskQuestionModal from "@/components/AskQuestionModal";
+import { AskQuestionModal } from "@/components/question";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import AuthGuard from "@/components/AuthGuard";
+import AuthGuard from "@/components/auth/AuthGuard";
 import { fetchMyFeed, clearFeed } from "@/store/question/questionFeedSlice";
 
 export default function Feed() {

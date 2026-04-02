@@ -26,10 +26,9 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { setVote, removeVote } from "@/store/question/questionVoteSlice";
-import { AnswerList, AnswerForm } from "@/components/Answer";
-import EditAnswerModal from "@/components/EditAnswerModal";
-import EditQuestionModal from "@/components/EditQuestionModal";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import { AnswerList, AnswerForm, EditAnswerModal } from "@/components/answer";
+import EditQuestionModal from "@/components/question/EditQuestionModal";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 import { Comment } from "@/types/comment";
 import {
   getCommentsByAnswer,
@@ -37,7 +36,7 @@ import {
   updateComment,
   deleteComment,
 } from "@/api/comment";
-import EditCommentModal from "@/components/EditCommentModal";
+import { EditCommentModal } from "@/components/comment";
 
 function useQuestionState() {
   const [question, setQuestion] = useState<Question | null>(null);

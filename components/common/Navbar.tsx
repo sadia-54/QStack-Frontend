@@ -7,7 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { logoutUser } from "@/store/auth/authThunks";
-import AuthModal from "./AuthModal";
+import { AuthModal } from "@/components/auth";
 
 export default function Navbar() {
   const router = useRouter();

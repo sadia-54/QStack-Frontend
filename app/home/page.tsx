@@ -14,14 +14,13 @@ import {
 } from "@ant-design/icons";
 import { getQuestionFeed, updateQuestion, deleteQuestion, getPopularTags, getCommunityStats } from "@/api/question";
 import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, CommunityStats } from "@/types/question";
-import AskQuestionModal from "@/components/AskQuestionModal";
-import FilterToolbar from "@/components/FilterToolbar";
-import EditQuestionModal from "@/components/EditQuestionModal";
-import QuestionList from "@/components/Home/QuestionList";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import { AskQuestionModal, EditQuestionModal } from "@/components/question";
+import FilterToolbar from "@/components/common/FilterToolbar";
+import QuestionList from "@/components/question/QuestionList";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import AuthGuard from "@/components/AuthGuard";
+import AuthGuard from "@/components/auth/AuthGuard";
 import { fetchProfile } from "@/store/user/userThunks";
 
 const DEBOUNCE_DELAY = 500;
