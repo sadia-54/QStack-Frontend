@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Tabs, Form, Input, Button, message, Avatar, Space, Card, DatePicker } from "antd";
-import dayjs from "dayjs";
+import { Tabs, Form, Button, message, Avatar, Card } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -16,7 +15,6 @@ import {
   LockOutlined,
   CameraOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store";
 import { AuthGuard } from "@/components/auth";
 import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";

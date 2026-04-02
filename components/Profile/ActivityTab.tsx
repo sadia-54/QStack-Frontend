@@ -76,14 +76,15 @@ interface ActivityTabProps {
 
 export default function ActivityTab({ activities }: ActivityTabProps) {
   const router = useRouter();
-  const [activityDateRange, setActivityDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [activityDateRange, setActivityDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
   const [activityPage, setActivityPage] = useState(1);
 
   const filteredActivities = activityDateRange
     ? (activities || []).filter((item) => {
         const activityDate = new Date(item.created_at);
-        const startDate = activityDateRange[0].toDate();
-        const endDate = activityDateRange[1].endOf('day').toDate();
+        const startDate = activityDateRange[0]?.toDate();
+        const endDate = activityDateRange[1]?.endOf('day').toDate();
+        if (!startDate || !endDate) return false;
         return activityDate >= startDate && activityDate <= endDate;
       })
     : (activities || []);
@@ -125,7 +126,7 @@ export default function ActivityTab({ activities }: ActivityTabProps) {
     }
   };
 
-  const handleDateRangeChange = (dates: any) => {
+  const handleDateRangeChange = (dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null) => {
     setActivityDateRange(dates);
     setActivityPage(1);
   };

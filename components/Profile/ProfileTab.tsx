@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Tag, Button } from "antd";
+import { Card, Button } from "antd";
 import { EditOutlined, StarOutlined, ThunderboltOutlined, MessageOutlined } from "@ant-design/icons";
 import { Profile } from "@/types/user";
 

@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Tag, Button, Spin, App, Collapse, Avatar } from "antd";
 import {
-  ThunderboltOutlined,
-  MessageOutlined,
   UserOutlined,
-  ClockCircleOutlined,
   PlusOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
-import { getQuestionFeed, updateQuestion, deleteQuestion, getPopularTags, getCommunityStats } from "@/api/question";
-import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, CommunityStats } from "@/types/question";
+import { getQuestionFeed, deleteQuestion, getPopularTags, getCommunityStats } from "@/api/question";
+import { Question, SortOption, FeedQueryParams, TagStat, CommunityStats } from "@/types/question";
 import { AskQuestionModal, EditQuestionModal } from "@/components/question";
 import FilterToolbar from "@/components/common/FilterToolbar";
 import QuestionList from "@/components/question/QuestionList";
@@ -106,7 +103,7 @@ function HomePageContent() {
     const queryString = params.toString();
     const newPath = queryString ? `/home?${queryString}` : "/home";
     router.replace(newPath, { scroll: false });
-  }, [search, tag, sort]);
+  }, [search, tag, sort, router]);
 
   const hasActiveFilters = search !== "" || tag !== "" || sort !== "newest";
 
@@ -130,7 +127,7 @@ function HomePageContent() {
     }
   };
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     setLoading(true);
     try {
       const params: FeedQueryParams = {
@@ -161,7 +158,7 @@ function HomePageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, tag, sort]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -169,6 +166,7 @@ function HomePageContent() {
     }, DEBOUNCE_DELAY);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, tag, sort]);
 
   useEffect(() => {
@@ -232,21 +230,6 @@ function HomePageContent() {
   const handleEditQuestion = (question: Question) => {
     setEditingQuestion(question);
     setIsEditModalOpen(true);
-  };
-
-  const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
-    if (!editingQuestion) return;
-
-    try {
-      await updateQuestion(editingQuestion.id, data);
-      message.success("Question updated successfully!");
-      setIsEditModalOpen(false);
-      setEditingQuestion(null);
-      await fetchQuestions();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update question";
-      message.error(errorMessage);
-    }
   };
 
   const handleDeleteQuestion = (id: number) => {
