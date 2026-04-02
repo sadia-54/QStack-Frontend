@@ -446,6 +446,33 @@ body {
   color: var(--color-text-primary) !important;
 }
 
+/* Custom Range Picker for Activity Tab */
+.custom-range-picker {
+  background: var(--color-surface-elevated) !important;
+  border-color: var(--color-border) !important;
+}
+
+.custom-range-picker .ant-picker-input input {
+  color: var(--color-text-primary) !important;
+}
+
+.custom-range-picker .ant-picker-input input::placeholder {
+  color: var(--color-text-secondary) !important;
+}
+
+.custom-range-picker .anticon {
+  color: var(--color-text-secondary) !important;
+}
+
+.custom-range-picker:hover {
+  border-color: var(--color-accent) !important;
+}
+
+.custom-range-picker-focused {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-focus-ring) !important;
+}
+
 /* ============================================
    Animations
    ============================================ */

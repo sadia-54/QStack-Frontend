@@ -37,6 +37,8 @@ export interface ActivityItem {
   type: string; // question, answer, vote, edit, accept
   title?: string;
   target_id?: number;
+  question_id?: number; // For answer activities, links to the question
+  entity_type?: 'question' | 'answer'; // For vote/edit activities to indicate what was voted/edited
   value?: number;
   created_at: string;
 }
