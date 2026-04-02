@@ -3,7 +3,7 @@
 import { ConfigProvider, theme, App } from "antd";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/store";
-import AuthInitializer from "@/components/AuthInitializer";
+import { AuthInitializer } from "@/components/auth";
 
 export default function Providers({
   children,

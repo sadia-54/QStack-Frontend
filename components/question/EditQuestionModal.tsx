@@ -7,7 +7,7 @@ import { updateQuestion } from "@/api/question";
 import { Question, CreateQuestionRequest } from "@/types/question";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import RichTextEditor from "@/components/TextEditor";
+import RichTextEditor from "../common/TextEditor";
 
 interface EditQuestionModalProps {
   question: Question | null;
@@ -26,20 +26,20 @@ export default function EditQuestionModal({
   const [description, setDescription] = useState("");
   const [form] = Form.useForm();
 
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (question) {
+    if (question && open) {
       form.setFieldsValue({
         title: question.title,
         tags: question.tags?.join(", "),
       });
       setDescription(question.description);
     }
-  }, [question, form]);
+  }, [question, open, form]);
 
   const handleSubmit = async (values: CreateQuestionRequest) => {
-    if (!accessToken || !question) {
+    if (!isAuthenticated || !question) {
       message.error("Authentication required");
       return;
     }
@@ -49,11 +49,11 @@ export default function EditQuestionModal({
       return;
     }
 
-    const tagsInput = (values as any).tags as string;
+    const tagsInput = typeof values.tags === "string" ? values.tags : (values.tags as string[])?.[0] || "";
     const tagsArray = tagsInput
       .split(/[,\s]+/)
-      .map((tag: string) => tag.trim())
-      .filter((tag: string) => tag.length > 0);
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
 
     setLoading(true);
 
@@ -64,8 +64,7 @@ export default function EditQuestionModal({
           ...values,
           description,
           tags: tagsArray,
-        },
-        accessToken
+        }
       );
 
       message.success("Question updated successfully!");
@@ -101,21 +100,21 @@ export default function EditQuestionModal({
       className="glass-modal"
       styles={{
         body: {
-          background: "rgba(17, 22, 44, 0.95)",
-          borderRadius: "16px",
+          background: "var(--color-surface-elevated)",
+          borderRadius: "12px",
           backdropFilter: "blur(20px)",
           padding: "24px",
-          boxShadow: "0 30px 80px rgba(0,0,0,0.5)",
+          boxShadow: "0 24px 48px rgba(0,0,0,0.4)",
         },
         header: {
-          borderBottom: "1px solid rgba(139, 92, 246, 0.2)",
+          borderBottom: "1px solid var(--color-border-soft)",
           paddingBottom: "12px",
         },
       }}
       title={
         <div>
-          <EditOutlined className="text-purple-300" />
-          <span className="text-xl font-semibold">Edit Question</span>
+          <EditOutlined className="text-primary" />
+          <span className="text-title text-text-primary">Edit Question</span>
         </div>
       }
     >
@@ -127,7 +126,7 @@ export default function EditQuestionModal({
       >
         <Form.Item
           className="!mb-5"
-          label={<span className="text-gray-200/80">Title</span>}
+          label={<span className="text-text-secondary">Title</span>}
           name="title"
           rules={[
             { required: true, message: "Please enter a title" },
@@ -137,12 +136,12 @@ export default function EditQuestionModal({
           <Input
             placeholder="e.g., How to implement JWT authentication in Next.js?"
             size="large"
-            className="!bg-white/5 !border-purple-400/20 !text-white hover:!border-purple-400/40 focus:!border-purple-400/60"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
             styles={{
               input: {
-                color: "white",
-                ["::placeholder" as any]: {
-                  color: "rgba(255,255,255,0.4)",
+                color: "var(--color-text-primary)",
+                ["::placeholder" as unknown as string]: {
+                  color: "var(--color-text-muted)",
                 },
               },
             }}
@@ -150,13 +149,13 @@ export default function EditQuestionModal({
         </Form.Item>
 
         <Form.Item
-          label={<span className="text-gray-200/80">Description</span>}
+          label={<span className="text-text-secondary">Description</span>}
         >
           <RichTextEditor value={description} onChange={setDescription} />
         </Form.Item>
 
         <Form.Item
-          label={<span className="text-gray-200/80">Tags</span>}
+          label={<span className="text-text-secondary">Tags</span>}
           name="tags"
           rules={[
             { required: true, message: "Please enter at least one tag" },
@@ -173,12 +172,12 @@ export default function EditQuestionModal({
           <Input
             placeholder="e.g., javascript react nextjs (comma or space separated)"
             size="large"
-            className="!bg-white/5 !border-purple-400/20 !text-white hover:!border-purple-400/40 focus:!border-purple-400/60"
+            className="!bg-surface !border hover:!border-accent focus:!border-accent"
             styles={{
               input: {
-                color: "white",
-                ["::placeholder" as any]: {
-                  color: "rgba(255,255,255,0.4)",
+                color: "var(--color-text-primary)",
+                ["::placeholder" as unknown as string]: {
+                  color: "var(--color-text-muted)",
                 },
               },
             }}
@@ -189,7 +188,7 @@ export default function EditQuestionModal({
           <Button
             size="large"
             onClick={handleClose}
-            className="!bg-white/5 mx-3 !text-white !border-white/10 hover:!border-purple-400/30"
+            className="!bg-surface !text-text-primary !border hover:!border-accent"
           >
             Cancel
           </Button>

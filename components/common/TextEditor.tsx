@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { createLowlight } from "lowlight";
 import { useEffect } from "react";
+import Image from "@tiptap/extension-image";
 
 interface Props {
   value: string;
@@ -24,6 +25,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         lowlight,
         defaultLanguage: "javascript",
       }),
+      Image,
     ],
     content: value,
     immediatelyRender: false,
@@ -31,6 +33,34 @@ export default function RichTextEditor({ value, onChange }: Props) {
       onChange(editor.getHTML());
     },
   });
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      editor?.chain().focus().setImage({ src: data.url }).run();
+
+      event.target.value = ""; // reset input
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
@@ -41,15 +71,15 @@ export default function RichTextEditor({ value, onChange }: Props) {
   if (!editor) return null;
 
   return (
-    <div className="border border-purple-400/20 rounded-xl bg-white/5 overflow-hidden">
+    <div className="border border-border rounded-xl bg-surface overflow-hidden">
 
       {/* Toolbar */}
-      <div className="flex gap-1 border-b border-purple-400/20 px-3 py-2 bg-white/5">
+      <div className="flex gap-1 border-b border-border px-3 py-2 bg-surface">
 
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           <b>B</b>
         </button>
@@ -57,7 +87,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           <i>I</i>
         </button>
@@ -65,7 +95,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           {"</>"}
         </button>
@@ -73,7 +103,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           H2
         </button>
@@ -81,7 +111,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           • List
         </button>
@@ -89,17 +119,27 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className="px-3 py-1 text-sm rounded-md text-gray-300 hover:bg-purple-500/20 hover:text-white transition"
+          className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition"
         >
           1. List
         </button>
+
+        <label className="px-3 py-1 text-base rounded-md text-text-secondary hover:bg-hover-bg hover:text-text-primary transition cursor-pointer">
+          Image
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            hidden
+          />
+        </label>
 
       </div>
 
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="min-h-[260px] p-3 text-white focus:outline-none"
+        className="min-h-[260px] p-3 text-text-primary focus:outline-none"
       />
     </div>
   );

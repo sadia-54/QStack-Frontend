@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User, Profile } from "@/types/user";
+import { User, Profile, ActivityItem } from "@/types/user";
 
 interface UserState {
   currentUser: User | null;
   profile: Profile | null;
+  activities: ActivityItem[];
+  userEmail: string | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -11,6 +13,8 @@ interface UserState {
 const initialState: UserState = {
   currentUser: null,
   profile: null,
+  activities: [],
+  userEmail: null,
   isLoading: false,
   error: null,
 };
@@ -34,6 +38,12 @@ const userSlice = createSlice({
         state.profile.bio = action.payload;
       }
     },
+    setActivity: (state, action: PayloadAction<ActivityItem[]>) => {
+      state.activities = action.payload;
+    },
+    setUserEmail: (state, action: PayloadAction<string>) => {
+      state.userEmail = action.payload;
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -48,6 +58,8 @@ export const {
   clearUser,
   setProfile,
   updateProfileBio,
+  setActivity,
+  setUserEmail,
   setLoading,
   setError,
 } = userSlice.actions;

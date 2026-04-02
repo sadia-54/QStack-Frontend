@@ -1,30 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, Avatar, Tag, Input, Select } from "antd";
-import {
-  UserOutlined,
-  SearchOutlined,
-  ThunderboltOutlined,
-  MessageOutlined,
-  StarOutlined,
-} from "@ant-design/icons";
-import { getUsers } from "@/api/user";
-import { User } from "@/types/user";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import AuthGuard from "@/components/AuthGuard";
+import { UserOutlined, SearchOutlined, ThunderboltOutlined, MessageOutlined, StarOutlined } from "@ant-design/icons";
+import { getCommunityMembers } from "@/api/user";
+import { UserSummaryPublic } from "@/types/user";
+import { AuthGuard } from "@/components/auth";
+import UserProfileModal from "@/components/users/UserProfileModal";
 
 const { Option } = Select;
 
 export default function Users() {
-  const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserSummaryPublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
@@ -43,10 +35,10 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const data = await getUsers();
+      const data = await getCommunityMembers();
       setUsers(data);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch community members:", error);
     } finally {
       setLoading(false);
     }
@@ -57,17 +49,23 @@ export default function Users() {
   }, []);
 
   const handleUserClick = (id: number) => {
-    router.push(`/profile/${id}`);
+    setSelectedUserId(id);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUserId(null);
   };
 
   if (loading) {
     return (
       <AuthGuard>
         <div className="relative starry min-h-screen px-4 py-6">
-          <div className="glow -top-60 -left-60 bg-purple-900/40" />
-          <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+          <div className="glow -top-60 -left-60 bg-accent/20" />
+          <div className="glow -bottom-60 -right-60 bg-accent/10" />
           <div className="relative z-10 mx-auto max-w-[1200px] flex items-center justify-center min-h-[60vh]">
-            <div className="text-gray-200/60 text-lg">Loading users...</div>
+            <div className="text-text-muted text-lg">Loading users...</div>
           </div>
         </div>
       </AuthGuard>
@@ -77,15 +75,15 @@ export default function Users() {
   return (
     <AuthGuard>
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1200px]">
           {/* Header */}
-          <div className="glass !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8">
-            <h1 className="text-2xl font-semibold text-white">Community Members</h1>
-            <p className="text-sm text-gray-200/60 mt-1">
-              Connect with developers from around the world
+          <div className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 mb-8">
+            <h1 className="text-2xl font-semibold text-text-primary">Community Members</h1>
+            <p className="text-meta text-text-muted mt-1">
+              Connect with {users.length} developers from around the world
             </p>
           </div>
 
@@ -93,9 +91,9 @@ export default function Users() {
           <div className="flex gap-4 mb-6">
             <Input
               placeholder="Search by username..."
-              prefix={<SearchOutlined className="text-purple-300" />}
+              prefix={<SearchOutlined className="text-primary" />}
               size="large"
-              className="!bg-white/5 !border-purple-400/20 !text-white placeholder:text-gray-200/40 flex-1"
+              className="!bg-surface !border hover:!border-accent focus:!border-accent placeholder:text-text-muted flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -104,65 +102,72 @@ export default function Users() {
               onChange={setSortBy}
               size="large"
               className="!w-[200px]"
-              dropdownClassName="!bg-[#0b1026] !border-purple-400/20"
+              classNames={{ popup: { root: "!bg-surface-elevated !border" } }}
             >
-              <Option value="newest" className="!text-white">Newest</Option>
-              <Option value="oldest" className="!text-white">Oldest</Option>
+              <Option value="newest" className="!text-text-primary">Newest</Option>
+              <Option value="oldest" className="!text-text-primary">Oldest</Option>
             </Select>
           </div>
 
           {/* Users Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
             {sortedUsers.map((user) => (
               <Card
                 key={user.id}
-                className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition cursor-pointer"
+                className="bg-surface !rounded-2xl !text-white hover:!border-accent transition cursor-pointer"
                 onClick={() => handleUserClick(user.id)}
               >
-                <div className="flex flex-col items-center text-center p-4">
+                <div className="flex gap-4">
                   <Avatar
-                    size={64}
+                    size={56}
+                    src={user.profile_image}
                     icon={<UserOutlined />}
-                    className="!bg-purple-500/20 !border-2 !border-purple-400/30 mb-4"
+                    className="!bg-hover-bg !border-2 !border-primary/30 flex-shrink-0"
                   />
-                  <h3 className="text-lg font-medium text-purple-200 hover:text-white transition">
-                    {user.username}
-                  </h3>
-                  <p className="text-sm text-gray-200/60 mt-1">
-                    {user.email}
-                  </p>
-                  
-                  <div className="flex items-center gap-4 mt-4 text-sm text-gray-200/60">
-                    <div className="flex items-center gap-1">
-                      <ThunderboltOutlined className="text-yellow-400" />
-                      <span>0</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageOutlined className="text-blue-400" />
-                      <span>0</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <StarOutlined className="text-green-400" />
-                      <span>0</span>
-                    </div>
-                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-title text-text-primary hover:text-primary transition truncate">
+                      {user.username}
+                    </h3>
 
-                  <Tag className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200 mt-4">
-                    Member
-                  </Tag>
+                    <div className="flex items-center gap-3 mt-2 text-meta text-text-muted">
+                      <div className="flex items-center gap-1">
+                        <ThunderboltOutlined className="text-warning" />
+                        <span>{user.total_votes}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageOutlined className="text-primary" />
+                        <span>{user.total_questions}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <StarOutlined className="text-success" />
+                        <span>{user.total_answers}</span>
+                      </div>
+                    </div>
+
+                    <Tag className="!bg-hover-bg !border-border-soft !text-text-secondary mt-2">
+                      Member
+                    </Tag>
+                  </div>
                 </div>
               </Card>
             ))}
           </div>
 
           {sortedUsers.length === 0 && (
-            <div className="glass !rounded-2xl !text-white p-8 text-center">
-              <div className="text-gray-200/60 text-lg">
+            <div className="bg-surface !rounded-2xl !text-white p-8 text-center">
+              <div className="text-text-muted text-base">
                 {searchTerm ? "No users match your search" : "No users yet"}
               </div>
             </div>
           )}
         </div>
+
+        {/* User Profile Modal */}
+        <UserProfileModal
+          open={isModalOpen}
+          userId={selectedUserId}
+          onClose={handleCloseModal}
+        />
       </div>
     </AuthGuard>
   );

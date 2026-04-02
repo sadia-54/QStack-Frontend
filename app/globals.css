@@ -2,22 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   Design System - CSS Variables
+   GitHub-inspired dark theme
+   ============================================ */
 :root {
-  --bg: #070b1f;
-  --violet: #8b5cf6;
-  --violet-strong: #a855f7;
-  --blue-glow: #3b82f6;
+  /* Background colors */
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-elevated: #1c2128;
+
+  /* Border colors */
+  --color-border: #30363d;
+  --color-border-soft: #21262d;
+
+  /* Text colors */
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #9da7b3;
+  --color-text-muted: #6e7681;
+
+  /* Primary action colors */
+  --color-primary: #464d97;
+  --color-primary-hover: #5a62b5;
+  --color-primary-active: #5057a6;
+
+  /* Status colors */
+  --color-success: #238636;
+  --color-warning: #d29922;
+  --color-error: #f85149;
+
+  /* Accent/Glow colors - neutral white for border glows */
+  --color-accent: rgba(255, 255, 255, 0.5);
+  --color-accent-soft: rgba(255, 255, 255, 0.3);
+
+  /* Interaction states */
+  --color-focus-ring: rgba(74, 81, 164, 0.25);
+  --color-hover-bg: rgba(62, 69, 146, 0.178);
+  --color-selected-bg: rgba(62, 69, 142, 0.368);
 }
 
-/* Background */
+/* ============================================
+   Base Styles
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background: linear-gradient(180deg,
-      #0b1026 0%,
-      #0a0f22 40%,
-      #080d1e 75%,
-      #070b1f 100%);
-  background-attachment: fixed;
-  color: white;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
   overflow-x: hidden;
 }
 
@@ -26,48 +59,48 @@ body {
   min-height: 100%;
 }
 
-/* Glow blobs */
-.glow {
-  position: absolute;
-  width: 850px;
-  height: 850px;
-  border-radius: 999px;
-  filter: blur(140px);
-  opacity: 0.85;
-  pointer-events: none;
-}
+/* ============================================
+   Utility Classes
+   ============================================ */
 
-/* Glass cards */
+/* Glass effect - using new design tokens */
 .glass {
-  background: rgba(17, 22, 44, 0.65);
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  backdrop-filter: blur(18px);
-  transition: all 0.3s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
 }
 
 .glass:hover {
-  border-color: rgba(139, 92, 246, 0.35);
+  border-color: var(--color-border);
 }
 
-/* Strong glass */
+/* Strong glass - elevated surface */
 .glass-strong {
-  background: rgba(15, 20, 40, 0.75);
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  backdrop-filter: blur(22px);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(16px);
 }
 
-/* Gradient button */
+/* ============================================
+   Component Styles
+   ============================================ */
+
+/* Gradient button - primary action */
 .btn-gradient {
-  background: linear-gradient(90deg, #580d95 0%, #4323a4 50%, #3506a1 100%) !important;
+  background: var(--color-primary) !important;
   border: 0 !important;
-  color: white !important;
-  box-shadow: 0 8px 30px rgba(168, 85, 247, 0.35);
-  transition: all 0.3s ease;
+  color: var(--color-text-primary) !important;
+  transition: all 0.2s ease;
 }
 
 .btn-gradient:hover {
-  box-shadow: 0 10px 40px rgba(168, 85, 247, 0.5);
-  transform: translateY(-1.5px);
+  background: var(--color-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-gradient:active {
+  background: var(--color-primary-active) !important;
 }
 
 /* Feature cards */
@@ -75,70 +108,75 @@ body {
   padding: 20px !important;
 }
 
-/* Sidebar menu styles */
+/* ============================================
+   Sidebar Menu Styles
+   ============================================ */
 .sidebar-menu .ant-menu-item {
   margin: 8px 0 !important;
-  border-radius: 12px !important;
-  transition: all 0.3s ease !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
 }
 
 .sidebar-menu .ant-menu-item:hover {
-  background: rgba(139, 92, 246, 0.15) !important;
+  background: var(--color-hover-bg) !important;
 }
 
 .sidebar-menu .ant-menu-item-selected {
-  background: linear-gradient(90deg, rgba(88, 13, 149, 0.4) 0%, rgba(67, 35, 164, 0.4) 50%, rgba(53, 6, 161, 0.4) 100%) !important;
-  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  background: var(--color-selected-bg) !important;
 }
 
 .sidebar-menu .ant-menu-item-selected .anticon {
-  color: #a855f7 !important;
+  color: var(--color-accent) !important;
 }
 
 .sidebar-menu .ant-menu-item .anticon {
-  color: #c4b5fd !important;
-  transition: color 0.3s ease !important;
+  color: var(--color-text-secondary) !important;
+  transition: color 0.2s ease !important;
 }
 
 .sidebar-menu .ant-menu-item:hover .anticon {
-  color: #a855f7 !important;
+  color: var(--color-accent) !important;
 }
 
 .sidebar-menu .ant-menu-title-content {
-  color: #e9d5ff !important;
-  font-size: 18px !important;
+  color: var(--color-text-primary) !important;
+  font-size: 16px !important;
 }
 
-/* Filter toolbar select styles */
+/* ============================================
+   Filter Toolbar Select Styles
+   ============================================ */
 .filter-select .ant-select-selector {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(139, 92, 246, 0.2) !important;
-  color: white !important;
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .filter-select .ant-select-selector:hover {
-  border-color: rgba(139, 92, 246, 0.4) !important;
+  border-color: var(--color-accent) !important;
 }
 
 .filter-select .ant-select-arrow {
-  color: rgba(139, 92, 246, 0.8) !important;
+  color: var(--color-text-secondary) !important;
 }
 
 .filter-select .ant-select-placeholder {
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: var(--color-text-muted) !important;
 }
 
 .filter-select .ant-select-selection-item {
-  color: white !important;
+  color: var(--color-text-primary) !important;
 }
 
-/* For editor codeblocks */
+/* ============================================
+   Editor (ProseMirror) Styles
+   ============================================ */
 .ProseMirror {
   outline: none;
   min-height: 280px;
-  font-size: 20px;
-  line-height: 1.7;
-  color: #e5e7eb;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
 }
 
 .ProseMirror p {
@@ -146,18 +184,20 @@ body {
 }
 
 .ProseMirror h2 {
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 600;
   margin: 12px 0;
+  color: var(--color-text-primary);
 }
 
 .ProseMirror pre {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 8px;
   margin: 10px 0;
   overflow-x: auto;
+  border: 1px solid var(--color-border-soft);
 }
 
 .ProseMirror code {
@@ -165,11 +205,8 @@ body {
   white-space: pre-wrap;
   line-height: 1.6;
   font-family: "Fira Code", monospace;
+  color: var(--color-text-secondary);
 }
-
-/* .ProseMirror code {
-  font-family: monospace;
-} */
 
 .ProseMirror ul {
   list-style-type: disc;
@@ -185,7 +222,260 @@ body {
   margin: 4px 0;
 }
 
-/* Fade in animation for expanded content */
+/* ============================================
+   Modal Styles
+   ============================================ */
+.glass-modal .ant-modal-content,
+.dark-modal .ant-modal-content {
+  background: var(--color-surface-elevated) !important;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+}
+
+.glass-modal .ant-modal-header,
+.dark-modal .ant-modal-header {
+  background: var(--color-surface-elevated) !important;
+  border-bottom: 1px solid var(--color-border-soft);
+  border-radius: 12px 12px 0 0;
+  padding: 16px 24px;
+}
+
+.glass-modal .ant-modal-title,
+.dark-modal .ant-modal-title {
+  color: var(--color-text-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Ant Design Overrides
+   ============================================ */
+
+/* Buttons */
+.ant-btn {
+  border-radius: 6px !important;
+  font-size: 15px !important;
+}
+
+/* Cards */
+.ant-card {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border-soft) !important;
+}
+
+/* Inputs */
+.ant-input {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 6px !important;
+}
+
+.ant-input:hover {
+  border-color: var(--color-primary) !important;
+}
+
+.ant-input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+.ant-input::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+/* Filter toolbar search input - consistent border colors (overrides global .ant-input) */
+.filter-search-input .ant-input {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+.filter-search-input .ant-input:hover {
+  border-color: var(--color-accent) !important;
+}
+
+.filter-search-input .ant-input:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+/* Select */
+.ant-select .ant-select-selector {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 6px !important;
+}
+
+.ant-select:hover .ant-select-selector {
+  border-color: var(--color-primary) !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+.ant-select-arrow {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Dropdown */
+.ant-select-dropdown,
+.ant-dropdown {
+  background: var(--color-surface-elevated) !important;
+  border-color: var(--color-border) !important;
+}
+
+.ant-select-item {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item:hover {
+  background: var(--color-hover-bg) !important;
+}
+
+.ant-select-item-selected {
+  background: var(--color-selected-bg) !important;
+  color: var(--color-accent) !important;
+}
+
+/* Tags */
+.ant-tag {
+  border-radius: 6px !important;
+  background: var(--color-hover-bg) !important;
+  border-color: var(--color-border-soft) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* Menu */
+.ant-menu-dark {
+  background: transparent !important;
+}
+
+.ant-menu-item {
+  color: var(--color-text-secondary) !important;
+}
+
+.ant-menu-item:hover {
+  background: var(--color-hover-bg) !important;
+}
+
+.ant-menu-item-selected {
+  background: var(--color-selected-bg) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Tabs */
+.ant-tabs-tab {
+  color: var(--color-text-secondary) !important;
+}
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--color-primary) !important;
+}
+
+.ant-tabs-ink-bar {
+  background: var(--color-primary) !important;
+}
+
+/* Avatar */
+.ant-avatar {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Modal */
+.ant-modal-content {
+  background: var(--color-surface-elevated) !important;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.ant-modal-header {
+  background: var(--color-surface-elevated) !important;
+  border-bottom: 1px solid var(--color-border-soft);
+  border-radius: 12px 12px 0 0;
+}
+
+.ant-modal-title {
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   Pagination
+   ============================================ */
+.ant-pagination .ant-pagination-item {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+.ant-pagination .ant-pagination-item a {
+  color: var(--color-text-secondary) !important;
+}
+
+.ant-pagination .ant-pagination-item:hover {
+  border-color: var(--color-accent) !important;
+}
+
+.ant-pagination .ant-pagination-item:hover a {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-pagination .ant-pagination-item-active {
+  background: var(--color-surface) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.ant-pagination .ant-pagination-item-active a {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+.ant-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  border-color: var(--color-accent) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Custom Range Picker for Activity Tab */
+.custom-range-picker {
+  background: var(--color-surface-elevated) !important;
+  border-color: var(--color-border) !important;
+}
+
+.custom-range-picker .ant-picker-input input {
+  color: var(--color-text-primary) !important;
+}
+
+.custom-range-picker .ant-picker-input input::placeholder {
+  color: var(--color-text-secondary) !important;
+}
+
+.custom-range-picker .anticon {
+  color: var(--color-text-secondary) !important;
+}
+
+.custom-range-picker:hover {
+  border-color: var(--color-accent) !important;
+}
+
+.custom-range-picker-focused {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-focus-ring) !important;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -198,5 +488,14 @@ body {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ============================================
+   Starry Background (kept for landing page)
+   ============================================ */
+.starry {
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(70, 77, 151, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(70, 77, 151, 0.05) 0%, transparent 50%);
 }

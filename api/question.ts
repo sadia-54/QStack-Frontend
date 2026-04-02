@@ -1,4 +1,4 @@
-import { CreateQuestionRequest, FeedQueryParams, VoteQuestionRequest } from "../types/question";
+import { CreateQuestionRequest, FeedQueryParams, VoteQuestionRequest, TagStat, CommunityStats } from "../types/question";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -46,15 +46,14 @@ export const getQuestionById = async (id: number) => {
 };
 
 export const createQuestion = async (
-  payload: CreateQuestionRequest,
-  accessToken: string
+  payload: CreateQuestionRequest
 ) => {
   const res = await fetch(`${BASE_URL}/questions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -69,15 +68,14 @@ export const createQuestion = async (
 
 export const updateQuestion = async (
   id: number,
-  payload: CreateQuestionRequest,
-  accessToken: string
+  payload: CreateQuestionRequest
 ) => {
   const res = await fetch(`${BASE_URL}/questions/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -90,12 +88,10 @@ export const updateQuestion = async (
   return data;
 };
 
-export const deleteQuestion = async (id: number, accessToken: string) => {
+export const deleteQuestion = async (id: number) => {
   const res = await fetch(`${BASE_URL}/questions/${id}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   });
 
   const data = await res.json();
@@ -109,15 +105,14 @@ export const deleteQuestion = async (id: number, accessToken: string) => {
 
 export const voteQuestion = async (
   id: number,
-  payload: VoteQuestionRequest,
-  accessToken: string
+  payload: VoteQuestionRequest
 ) => {
   const res = await fetch(`${BASE_URL}/questions/${id}/vote`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -131,8 +126,7 @@ export const voteQuestion = async (
 };
 
 export const getMyFeed = async (
-  params?: { limit?: number; offset?: number },
-  accessToken?: string | null
+  params?: { limit?: number; offset?: number }
 ) => {
   const searchParams = new URLSearchParams();
 
@@ -144,15 +138,58 @@ export const getMyFeed = async (
 
   const res = await fetch(url, {
     method: "GET",
-    headers: accessToken
-      ? {
-          Authorization: `Bearer ${accessToken}`,
-        }
-      : undefined,
+    credentials: "include",
   });
 
   if (!res.ok) {
     throw new Error("Failed to fetch my feed");
+  }
+
+  return res.json();
+};
+
+export const getMyQuestions = async (
+  params?: { limit?: number; offset?: number }
+) => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.limit) searchParams.append("limit", params.limit.toString());
+  if (params?.offset) searchParams.append("offset", params.offset.toString());
+
+  const queryString = searchParams.toString();
+  const url = `${BASE_URL}/questions/my${queryString ? `?${queryString}` : ""}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch my questions");
+  }
+
+  return res.json();
+};
+
+export const getPopularTags = async (): Promise<TagStat[]> => {
+  const res = await fetch(`${BASE_URL}/tags/popular`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch popular tags");
+  }
+
+  return res.json();
+};
+
+export const getCommunityStats = async (): Promise<CommunityStats> => {
+  const res = await fetch(`${BASE_URL}/users/community/stats`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch community stats");
   }
 
   return res.json();

@@ -16,15 +16,14 @@ export const getAnswersByQuestion = async (questionId: number) => {
 
 export const createAnswer = async (
   questionId: number,
-  payload: CreateAnswerRequest,
-  accessToken: string
+  payload: CreateAnswerRequest
 ) => {
   const res = await fetch(`${BASE_URL}/answers/question/${questionId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -39,15 +38,14 @@ export const createAnswer = async (
 
 export const updateAnswer = async (
   answerId: number,
-  payload: UpdateAnswerRequest,
-  accessToken: string
+  payload: UpdateAnswerRequest
 ) => {
   const res = await fetch(`${BASE_URL}/answers/${answerId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -60,12 +58,10 @@ export const updateAnswer = async (
   return data;
 };
 
-export const deleteAnswer = async (answerId: number, accessToken: string) => {
+export const deleteAnswer = async (answerId: number) => {
   const res = await fetch(`${BASE_URL}/answers/${answerId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -76,12 +72,10 @@ export const deleteAnswer = async (answerId: number, accessToken: string) => {
   return res.json();
 };
 
-export const acceptAnswer = async (answerId: number, accessToken: string) => {
+export const acceptAnswer = async (answerId: number) => {
   const res = await fetch(`${BASE_URL}/answers/${answerId}/accept`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   });
 
   if (!res.ok) {

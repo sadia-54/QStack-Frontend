@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Question } from "@/types/question";
-import { getMyFeed as getMyFeedApi } from "@/api/question";
+import { getMyQuestions as getMyQuestionsApi } from "@/api/question";
 import { RootState, AppDispatch } from "@/store";
 
-interface QuestionFeedState {
+interface MyQuestionsState {
   questions: Question[];
   isLoading: boolean;
   error: string | null;
@@ -12,7 +12,7 @@ interface QuestionFeedState {
   limit: number;
 }
 
-const initialState: QuestionFeedState = {
+const initialState: MyQuestionsState = {
   questions: [],
   isLoading: false,
   error: null,
@@ -21,30 +21,30 @@ const initialState: QuestionFeedState = {
   limit: 20,
 };
 
-export const fetchMyFeed = createAsyncThunk<
+export const fetchMyQuestions = createAsyncThunk<
   Question[],
   { limit?: number; offset?: number },
   { state: RootState; dispatch: AppDispatch }
->("questionFeed/fetchMyFeed", async (params, { rejectWithValue }) => {
+>("myQuestions/fetchMyQuestions", async (params, { rejectWithValue }) => {
   try {
-    const data = await getMyFeedApi(params);
+    const data = await getMyQuestionsApi(params);
     return data;
   } catch (error: any) {
-    return rejectWithValue(error.message || "Failed to fetch feed");
+    return rejectWithValue(error.message || "Failed to fetch my questions");
   }
 });
 
-const questionFeedSlice = createSlice({
-  name: "questionFeed",
+const myQuestionsSlice = createSlice({
+  name: "myQuestions",
   initialState,
   reducers: {
-    clearFeed: (state) => {
+    clearMyQuestions: (state) => {
       state.questions = [];
       state.offset = 0;
       state.hasMore = true;
       state.error = null;
     },
-    setFeedParams: (state, action: PayloadAction<{ limit?: number }>) => {
+    setMyQuestionsParams: (state, action: PayloadAction<{ limit?: number }>) => {
       if (action.payload.limit) {
         state.limit = action.payload.limit;
       }
@@ -52,11 +52,11 @@ const questionFeedSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMyFeed.pending, (state) => {
+      .addCase(fetchMyQuestions.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchMyFeed.fulfilled, (state, action) => {
+      .addCase(fetchMyQuestions.fulfilled, (state, action) => {
         state.isLoading = false;
 
         if (!action.payload || action.payload.length === 0) {
@@ -68,20 +68,15 @@ const questionFeedSlice = createSlice({
           state.hasMore = false;
         }
 
-        // Deduplicate questions by id
-        const newQuestions = action.payload.filter(
-          (newQ) => !state.questions.some((existingQ) => existingQ.id === newQ.id)
-        );
-
         if (state.offset === 0) {
           state.questions = action.payload;
         } else {
-          state.questions = [...state.questions, ...newQuestions];
+          state.questions = [...state.questions, ...action.payload];
         }
 
-        state.offset += newQuestions.length;
+        state.offset += action.payload.length;
       })
-      .addCase(fetchMyFeed.rejected, (state, action) => {
+      .addCase(fetchMyQuestions.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
         state.hasMore = false;
@@ -89,5 +84,5 @@ const questionFeedSlice = createSlice({
   },
 });
 
-export const { clearFeed, setFeedParams } = questionFeedSlice.actions;
-export default questionFeedSlice.reducer;
+export const { clearMyQuestions, setMyQuestionsParams } = myQuestionsSlice.actions;
+export default myQuestionsSlice.reducer;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Button, Tag, Avatar, Modal, Input, Space, message } from "antd";
+import { Tabs, Form, Button, message, Avatar, Card } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -10,24 +10,35 @@ import {
   ThunderboltOutlined,
   MessageOutlined,
   StarOutlined,
+  ClockCircleOutlined,
+  QuestionCircleOutlined,
+  LockOutlined,
+  CameraOutlined,
 } from "@ant-design/icons";
 import { RootState, AppDispatch } from "@/store";
-import AuthGuard from "@/components/AuthGuard";
-import { fetchProfile, updateUserProfile } from "@/store/user/userThunks";
-import { Profile as ProfileType } from "@/types/user";
+import { AuthGuard } from "@/components/auth";
+import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";
+import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
+import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/Profile";
 
-const { TextArea } = Input;
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentUserId } = useSelector((state: RootState) => state.auth);
-  const { profile, isLoading, error } = useSelector((state: RootState) => state.user);
+  const { currentUserId, isInitializing } = useSelector((state: RootState) => state.auth);
+  const { profile, activities, isLoading, error, userEmail } = useSelector((state: RootState) => state.user);
+  const { questions: myQuestions, isLoading: isQuestionsLoading } = useSelector((state: RootState) => state.myQuestions);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [bio, setBio] = useState("");
+  const [activeTab, setActiveTab] = useState("profile");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [passwordForm] = Form.useForm();
 
   useEffect(() => {
     if (currentUserId) {
       dispatch(fetchProfile(currentUserId));
+      dispatch(fetchUserEmail());
     }
   }, [dispatch, currentUserId]);
 
@@ -43,33 +54,156 @@ export default function ProfilePage() {
     }
   }, [error]);
 
+  if (isInitializing) {
+    return (
+      <AuthGuard>
+        <div className="relative starry min-h-screen px-4 py-6">
+          <div className="flex items-center justify-center h-full">
+            <p className="text-text-muted">Loading...</p>
+          </div>
+        </div>
+      </AuthGuard>
+    );
+  }
+
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSaveBio = async () => {
     try {
       await dispatch(updateUserProfile(bio));
       message.success("Profile updated successfully");
       setIsEditModalOpen(false);
-    } catch (err) {
+    } catch {
       message.error("Failed to update profile");
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelBio = () => {
     if (profile?.bio) {
       setBio(profile.bio);
     }
     setIsEditModalOpen(false);
   };
 
+  const handleImageUploadClick = () => {
+    setIsUploadModalOpen(true);
+  };
+
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      message.error("Please select an image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      message.error("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      await dispatch(uploadProfileImageThunk(file));
+      message.success("Profile image updated successfully");
+      setIsUploadModalOpen(false);
+    } catch {
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleLoadActivity = () => {
+    if (currentUserId && activities.length === 0) {
+      dispatch(fetchUserActivity(currentUserId));
+    }
+  };
+
+  const handleLoadMyQuestions = () => {
+    if (currentUserId && myQuestions.length === 0) {
+      dispatch(fetchMyQuestions({ limit: 20, offset: 0 }));
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePasswordChange = async (values: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+    try {
+      await dispatch(updateUserPassword(values.currentPassword, values.newPassword));
+      message.success("Password changed successfully");
+      passwordForm.resetFields();
+    } catch {
+    }
+  };
+
+  const tabItems = [
+    {
+      key: "profile",
+      label: (
+        <span className="flex items-center gap-2">
+          <UserOutlined />
+          Profile
+        </span>
+      ),
+      children: <ProfileTab profile={profile} onEditClick={handleEditClick} />,
+    },
+    {
+      key: "my-questions",
+      label: (
+        <span className="flex items-center gap-2">
+          <QuestionCircleOutlined />
+          My Questions
+        </span>
+      ),
+      children: (
+        <MyQuestionsTab
+          questions={myQuestions}
+          isLoading={isQuestionsLoading}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
+      ),
+    },
+    {
+      key: "activity",
+      label: (
+        <span className="flex items-center gap-2">
+          <ClockCircleOutlined />
+          Activity
+        </span>
+      ),
+      children: <ActivityTab activities={activities} />,
+    },
+    {
+      key: "settings",
+      label: (
+        <span className="flex items-center gap-2">
+          <LockOutlined />
+          Settings
+        </span>
+      ),
+      children: (
+        <SettingsTab
+          profile={profile}
+          userEmail={userEmail}
+          isLoading={isLoading}
+          onPasswordChange={handlePasswordChange}
+        />
+      ),
+    },
+  ];
+
   if (isLoading && !profile) {
     return (
       <AuthGuard>
         <div className="relative starry min-h-screen px-4 py-6">
           <div className="flex items-center justify-center h-full">
-            <p className="text-white/60">Loading profile...</p>
+            <p className="text-text-muted">Loading profile...</p>
           </div>
         </div>
       </AuthGuard>
@@ -79,29 +213,64 @@ export default function ProfilePage() {
   return (
     <AuthGuard>
       <div className="relative starry min-h-screen px-4 py-6">
-        <div className="glow -top-60 -left-60 bg-purple-900/40" />
-        <div className="glow -bottom-60 -right-60 bg-blue-900/40" />
+        <div className="glow -top-60 -left-60 bg-accent/20" />
+        <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1200px]">
-          {/* Profile Header */}
-          <Card className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition mb-6">
-            <div className="flex items-center gap-6">
-              <Avatar
-                size={80}
-                icon={<UserOutlined />}
-                className="!bg-purple-500/20 !border-2 !border-purple-400/30"
-              />
+          <Card className="bg-surface !rounded-2xl !border-border-soft hover:!border-accent/50 transition mb-6">
+            <div className="flex items-start gap-6">
+              <div className="relative">
+                <Avatar
+                  size={80}
+                  src={profile?.profile_image}
+                  icon={<UserOutlined />}
+                  className="!bg-surface-elevated !border-2 !border-primary/30"
+                />
+                <input
+                  type="file"
+                  id="profile-image-upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                  disabled={uploadingImage}
+                />
+                <label htmlFor="profile-image-upload">
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    size="small"
+                    icon={<CameraOutlined />}
+                    className="absolute -bottom-2 -right-2 h-8 w-8 !bg-primary hover:!bg-primary-hover"
+                    onClick={handleImageUploadClick}
+                    disabled={uploadingImage}
+                  />
+                </label>
+              </div>
               <div className="flex-1">
-                <h1 className="text-2xl font-semibold text-white">
+                <h1 className="text-2xl font-semibold text-text-primary">
                   {profile?.username || "User"}
                 </h1>
-                <p className="text-sm text-gray-200/60 flex items-center gap-2 mt-1">
+                <p className="text-meta text-text-muted flex items-center gap-2 mt-1">
                   <MailOutlined />
-                  {profile?.username ? `${profile.username}@qstack.com` : "user@example.com"}
+                  {userEmail || "user@example.com"}
                 </p>
                 {profile?.bio && (
-                  <p className="text-sm text-gray-200/80 mt-2">{profile.bio}</p>
+                  <p className="text-base text-text-secondary mt-3 line-clamp-2">{profile.bio}</p>
                 )}
+                <div className="flex items-center gap-4 mt-4">
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
+                    <StarOutlined className="text-warning" />
+                    <span>{profile?.total_votes || 0} reputation</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
+                    <ThunderboltOutlined className="text-primary" />
+                    <span>{profile?.total_questions || 0} questions</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-meta text-text-muted">
+                    <MessageOutlined className="text-success" />
+                    <span>{profile?.total_answers || 0} answers</span>
+                  </div>
+                </div>
               </div>
               <Button
                 className="btn-gradient"
@@ -113,106 +282,40 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6">
-            <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-yellow-400 mb-3">
-                  <StarOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-white">
-                  {profile?.total_votes || 0}
-                </div>
-                <div className="text-sm text-gray-200/60 mt-1">Reputation</div>
-              </div>
-            </Card>
-
-            <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-blue-400 mb-3">
-                  <ThunderboltOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-white">
-                  {profile?.total_questions || 0}
-                </div>
-                <div className="text-sm text-gray-200/60 mt-1">Questions</div>
-              </div>
-            </Card>
-
-            <Card
-              className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition"
-            >
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-green-400 mb-3">
-                  <MessageOutlined className="text-2xl" />
-                </div>
-                <div className="text-3xl font-semibold text-white">
-                  {profile?.total_answers || 0}
-                </div>
-                <div className="text-sm text-gray-200/60 mt-1">Answers</div>
-              </div>
-            </Card>
-
-            {/* Preferred Tags */}
-            <Card className="glass !rounded-2xl !text-white hover:!border-purple-400/30 transition">
-              <h3 className="text-lg font-semibold mb-4">Preferred Tags</h3>
-              {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.preferred_tags.map((tag) => (
-                    <Tag
-                      key={tag}
-                      className="!bg-purple-500/10 !border-purple-400/20 !text-purple-200"
-                    >
-                      {tag}
-                    </Tag>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-200/60">No preferred tags set</p>
-              )}
-            </Card>
-          </div>
+          <Tabs
+            activeKey={activeTab}
+            onChange={(key) => {
+              setActiveTab(key);
+              if (key === "activity") {
+                handleLoadActivity();
+              }
+              if (key === "my-questions") {
+                setCurrentPage(1);
+                handleLoadMyQuestions();
+              }
+            }}
+            items={tabItems}
+            className="!text-white"
+            destroyOnHidden={true}
+          />
         </div>
 
-        {/* Edit Profile Modal */}
-        <Modal
-          title="Edit Profile"
+        <EditProfileModal
           open={isEditModalOpen}
-          onOk={handleSave}
-          onCancel={handleCancel}
-          className="glass-modal"
-          footer={[
-            <Button key="cancel" onClick={handleCancel} className="!text-gray-300">
-              Cancel
-            </Button>,
-            <Button
-              key="save"
-              type="primary"
-              onClick={handleSave}
-              className="btn-gradient"
-              loading={isLoading}
-            >
-              Save Changes
-            </Button>,
-          ]}
-        >
-          <Space direction="vertical" className="w-full mt-4">
-            <div>
-              <label className="text-white/80 text-sm mb-2 block">Bio</label>
-              <TextArea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={4}
-                className="!bg-white/5 !text-white !border-white/10"
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-          </Space>
-        </Modal>
+          bio={bio}
+          isLoading={isLoading}
+          onBioChange={setBio}
+          onSave={handleSaveBio}
+          onCancel={handleCancelBio}
+        />
+
+        <UploadProfileImageModal
+          open={isUploadModalOpen}
+          uploadingImage={uploadingImage}
+          onCancel={() => setIsUploadModalOpen(false)}
+          setUploadingImage={setUploadingImage}
+          setIsUploadModalOpen={setIsUploadModalOpen}
+        />
       </div>
     </AuthGuard>
   );

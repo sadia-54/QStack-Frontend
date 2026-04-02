@@ -9,26 +9,45 @@ import {
   EditOutlined,
   DownOutlined,
   UpOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { Answer } from "@/types/answer";
+import { Comment } from "@/types/comment";
 import { useState } from "react";
+import { CommentList, CommentForm } from "@/components/comment";
 
 interface Props {
   answer: Answer;
   isQuestionOwner: boolean;
   isAnswerOwner: boolean;
+  currentUserId: number | null;
+  isAuthenticated: boolean;
+  comments: Comment[];
   onAccept?: (answerId: number) => void;
   onEdit?: (answer: Answer) => void;
   onDelete?: (answerId: number) => void;
+  onAddComment?: (body: string) => Promise<void>;
+  onEditComment?: (comment: Comment) => void;
+  onDeleteComment?: (commentId: number) => void;
+  onToggleComments?: () => void;
+  showComments: boolean;
 }
 
 export default function AnswerCard({
   answer,
   isQuestionOwner,
   isAnswerOwner,
+  currentUserId,
+  isAuthenticated,
+  comments,
   onAccept,
   onEdit,
   onDelete,
+  onAddComment,
+  onEditComment,
+  onDeleteComment,
+  onToggleComments,
+  showComments,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(answer.is_accepted);
 
@@ -47,7 +66,6 @@ export default function AnswerCard({
     return date.toLocaleDateString();
   };
 
-  // Extract first line as title (strip HTML tags)
   const getTitleFromContent = (html: string) => {
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
@@ -65,17 +83,17 @@ export default function AnswerCard({
 
   return (
     <Card
-      className={`glass !rounded-2xl !text-white !border-0 transition-all duration-300 overflow-hidden ${
-        answer.is_accepted ? "!border-green-500/30" : ""
+      className={`bg-surface !rounded-2xl !text-white !border-0 transition-all duration-300 overflow-hidden ${
+        answer.is_accepted ? "!border-success/30" : ""
       }`}
       styles={{ body: { padding: 0 } }}
     >
       <div className="flex">
         {/* Accept badge */}
         {answer.is_accepted && (
-          <div className="w-[80px] bg-green-900/20 flex flex-col items-center justify-start py-6 gap-2 rounded-l-2xl flex-shrink-0">
-            <CheckCircleOutlined className="text-green-400 text-3xl" />
-            <span className="text-xs text-green-200/80 uppercase tracking-wide text-center px-2">
+          <div className="w-[80px] bg-success/10 flex flex-col items-center justify-start py-6 gap-2 rounded-l-2xl flex-shrink-0">
+            <CheckCircleOutlined className="text-success text-3xl" />
+            <span className="text-meta text-text-secondary uppercase tracking-wide text-center px-2">
               Accepted
             </span>
           </div>
@@ -88,27 +106,27 @@ export default function AnswerCard({
             onClick={toggleExpand}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110 ${
-              answer.is_accepted ? "bg-green-500/20" : "bg-purple-500/20"
+              answer.is_accepted ? "bg-success/20" : "bg-hover-bg"
             }`}>
               {isExpanded ? (
-                <UpOutlined className={answer.is_accepted ? "text-green-300" : "text-purple-300"} />
+                <UpOutlined className={answer.is_accepted ? "text-success" : "text-text-secondary"} />
               ) : (
-                <DownOutlined className={answer.is_accepted ? "text-green-300" : "text-purple-300"} />
+                <DownOutlined className={answer.is_accepted ? "text-success" : "text-text-secondary"} />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-medium text-white truncate group-hover:text-purple-200 transition-colors">
+              <h3 className="text-base font-medium text-text-primary truncate group-hover:text-primary transition-colors">
                 {answerTitle || "Answer"}
               </h3>
-              <div className="flex items-center gap-2 text-xs text-gray-200/50 mt-1">
+              <div className="flex items-center gap-2 text-meta text-text-muted mt-1">
                 <UserOutlined />
                 <span className="truncate">{answer.author?.username || "Unknown"}</span>
-                <span className="text-gray-200/30">•</span>
+                <span className="text-text-muted">•</span>
                 <ClockCircleOutlined />
                 <span>{formatDate(answer.created_at)}</span>
               </div>
             </div>
-            <div className="text-xs text-gray-200/40 group-hover:text-purple-300 transition-colors flex-shrink-0">
+            <div className="text-meta text-text-muted group-hover:text-text-secondary transition-colors flex-shrink-0">
               {isExpanded ? "Collapse" : "Click to expand"}
             </div>
           </div>
@@ -116,31 +134,44 @@ export default function AnswerCard({
           {/* Expanded content */}
           {isExpanded && (
             <div className="animate-fadeIn">
-              <div className="h-px bg-purple-500/10 mb-4" />
+              <div className="h-px bg-border-soft mb-4" />
 
               {/* Answer content */}
               <div
-                className="ProseMirror text-gray-200 max-w-none mb-4 break-words"
+                className="ProseMirror text-text-secondary max-w-none mb-4 break-words"
                 dangerouslySetInnerHTML={{ __html: answer.description }}
               />
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-purple-500/10">
-                <div className="flex items-center gap-3 text-sm text-gray-200/60">
+              <div className="flex items-center justify-between pt-4 border-t border-border-soft">
+                <div className="flex items-center gap-3 text-meta text-text-muted">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center flex-shrink-0">
-                      <UserOutlined className="text-purple-300 text-xs" />
+                    <div className="w-6 h-6 rounded-full bg-selected-bg flex items-center justify-center flex-shrink-0">
+                      <UserOutlined className="text-primary text-meta" />
                     </div>
                     <span>{answer.author?.username || "Unknown"}</span>
                   </div>
-                  <span className="text-gray-200/30">•</span>
+                  <span className="text-text-muted">•</span>
                   <div className="flex items-center gap-2">
-                    <ClockCircleOutlined className="text-purple-300" />
+                    <ClockCircleOutlined className="text-primary" />
                     <span>answered {formatDate(answer.created_at)}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Comment toggle button */}
+                  <Button
+                    size="small"
+                    icon={<MessageOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleComments?.();
+                    }}
+                    className="!bg-selected-bg !border-border-soft !text-text-primary hover:!bg-hover-bg flex-shrink-0"
+                  >
+                    {comments.length > 0 ? `${comments.length}` : "Comment"}
+                  </Button>
+
                   {/* Accept button - only for question owner and not own answer */}
                   {showAcceptButton && (
                     <Button
@@ -150,7 +181,7 @@ export default function AnswerCard({
                         e.stopPropagation();
                         onAccept?.(answer.id);
                       }}
-                      className="!bg-green-500/20 !border-green-400/30 !text-green-200 hover:!bg-green-500/30"
+                      className="!bg-success/20 !border-success/30 !text-text-primary hover:!bg-success/30"
                     >
                       Accept
                     </Button>
@@ -166,7 +197,7 @@ export default function AnswerCard({
                           e.stopPropagation();
                           onEdit?.(answer);
                         }}
-                        className="!bg-purple-500/20 !border-purple-400/30 !text-purple-200 hover:!bg-purple-500/30 flex-shrink-0"
+                        className="!bg-selected-bg !border-primary/30 !text-text-primary hover:!bg-hover-bg flex-shrink-0"
                       >
                         Edit
                       </Button>
@@ -177,7 +208,7 @@ export default function AnswerCard({
                           e.stopPropagation();
                           onDelete?.(answer.id);
                         }}
-                        className="!bg-red-500/20 !border-red-400/30 !text-red-200 hover:!bg-red-500/30 flex-shrink-0"
+                        className="!bg-error/20 !border-error/30 !text-text-primary hover:!bg-error/30 flex-shrink-0"
                       >
                         Delete
                       </Button>
@@ -185,6 +216,25 @@ export default function AnswerCard({
                   )}
                 </div>
               </div>
+
+              {/* Comments section */}
+              {showComments && (
+                <>
+                  <div className="h-px bg-border-soft my-4" />
+                  <CommentList
+                    comments={comments}
+                    currentUserId={currentUserId}
+                    onDelete={(commentId) => onDeleteComment?.(commentId)}
+                    onEdit={(comment) => onEditComment?.(comment)}
+                  />
+                  {isAuthenticated && (
+                    <CommentForm
+                      onSubmit={(body) => onAddComment?.(body) || Promise.resolve()}
+                      disabled={false}
+                    />
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>

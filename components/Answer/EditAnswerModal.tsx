@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Modal, Button } from "antd";
-import RichTextEditor from "./TextEditor";
+import RichTextEditor from "../common/TextEditor";
 import { Answer } from "@/types/answer";
 
 interface Props {
@@ -41,9 +41,9 @@ export default function EditAnswerModal({
       centered
       className="dark-modal"
     >
-      <div className="text-white">
-        <h2 className="text-xl font-semibold mb-4">Edit Your Answer</h2>
-        
+      <div className="text-text-primary">
+        <h2 className="text-title mb-4 text-text-primary">Edit Your Answer</h2>
+
         <RichTextEditor
           value={description}
           onChange={setDescription}
@@ -52,7 +52,7 @@ export default function EditAnswerModal({
         <div className="flex items-center justify-end gap-3 mt-4">
           <Button
             onClick={onClose}
-            className="!bg-white/5 !text-white !border-white/10 hover:!border-purple-400/30"
+            className="!bg-surface !text-text-primary !border hover:!border-accent"
           >
             Cancel
           </Button>
