@@ -15,6 +15,7 @@ import {
   signupFailure,
   clearError,
 } from "@/store/auth/authSlice";
+import { fetchProfile, fetchUserEmail } from "@/store/user/userThunks";
 import { RootState, AppDispatch } from "@/store";
 
 interface AuthModalProps {
@@ -52,6 +53,22 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           refreshToken: "cookie",
         })
       );
+      // Fetch user profile data after login
+      const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (userRes.ok) {
+        const user = await userRes.json();
+        const userId = user.id ?? user.user_id;
+        if (userId) {
+          dispatch(fetchProfile(userId));
+          dispatch(fetchUserEmail());
+        }
+      }
       message.success(response.message || "Login successful!");
       signInForm.resetFields();
       onClose();

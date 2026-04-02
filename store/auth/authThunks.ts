@@ -1,6 +1,7 @@
 import { AppDispatch } from "../index";
 import { loginSuccess, logout, setCurrentUserId, authInitialized } from "./authSlice";
 import { loginApi } from "@/api/auth";
+import { fetchProfile, fetchUserEmail } from "../user/userThunks";
 
 export const loginUser =
   (identifier: string, password: string) =>
@@ -29,6 +30,12 @@ export const loginUser =
         userId: userId ?? undefined,
       })
     );
+
+    // Fetch user profile data after login
+    if (userId) {
+      dispatch(fetchProfile(userId));
+      dispatch(fetchUserEmail());
+    }
   };
 
 export const logoutUser =
