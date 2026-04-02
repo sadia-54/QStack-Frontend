@@ -14,8 +14,8 @@ import {
 import { Answer } from "@/types/answer";
 import { Comment } from "@/types/comment";
 import { useState } from "react";
-import CommentList from "./CommentList";
-import CommentForm from "./CommentForm";
+import CommentList from "../CommentList";
+import CommentForm from "../CommentForm";
 
 interface Props {
   answer: Answer;
@@ -67,7 +67,6 @@ export default function AnswerCard({
     return date.toLocaleDateString();
   };
 
-  // Extract first line as title (strip HTML tags)
   const getTitleFromContent = (html: string) => {
     const tmp = document.createElement("div");
     tmp.innerHTML = html;

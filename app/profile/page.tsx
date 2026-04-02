@@ -23,14 +23,9 @@ import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword,
 import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
 import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/Profile";
 
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-
-const PAGE_SIZE = 5;
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
   const { currentUserId, isInitializing } = useSelector((state: RootState) => state.auth);
   const { profile, activities, isLoading, error, userEmail } = useSelector((state: RootState) => state.user);
   const { questions: myQuestions, isLoading: isQuestionsLoading } = useSelector((state: RootState) => state.myQuestions);

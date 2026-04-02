@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "antd";
 import { SendOutlined, CloseOutlined } from "@ant-design/icons";
-import RichTextEditor from "./TextEditor";
+import RichTextEditor from "../TextEditor";
 
 interface Props {
   onSubmit: (description: string) => Promise<void>;

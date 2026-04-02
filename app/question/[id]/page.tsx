@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, Tag, Button, App, Modal } from "antd";
+import { Card, Tag, Button, App } from "antd";
 import {
   MessageOutlined,
   UserOutlined,
@@ -26,10 +26,10 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { setVote, removeVote } from "@/store/question/questionVoteSlice";
-import AnswerCard from "@/components/AnswerCard";
-import AnswerForm from "@/components/AnswerForm";
+import { AnswerList, AnswerForm } from "@/components/Answer";
 import EditAnswerModal from "@/components/EditAnswerModal";
 import EditQuestionModal from "@/components/EditQuestionModal";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { Comment } from "@/types/comment";
 import {
   getCommentsByAnswer,
@@ -372,10 +372,10 @@ export default function QuestionDetail() {
         <div className="relative z-10 mx-auto max-w-[1100px]">
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => router.push("/question")}
+            onClick={() => router.push("/home")}
             className="mb-4 !bg-selected-bg !border-border !text-text-primary hover:!bg-hover-bg"
           >
-            Back to Feed
+            Back to Home
           </Button>
           <Card className="bg-surface !rounded-2xl !text-white p-8 text-center">
             <div className="text-text-muted text-lg">Question not found</div>
@@ -512,36 +512,21 @@ export default function QuestionDetail() {
                 {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
               </h2>
 
-              {/* Answer List */}
-              {answers.length > 0 ? (
-                <div className="space-y-4 mb-6">
-                  {answers.map((answer) => (
-                    <AnswerCard
-                      key={answer.id}
-                      answer={answer}
-                      isQuestionOwner={isQuestionOwner}
-                      isAnswerOwner={currentUserIdNum ? answer.author.id === currentUserIdNum : false}
-                      currentUserId={currentUserIdNum}
-                      isAuthenticated={isAuthenticated}
-                      comments={commentsByAnswer[answer.id] || []}
-                      showComments={!!expandedComments[answer.id]}
-                      onAccept={handleAcceptAnswer}
-                      onEdit={handleEditClick}
-                      onDelete={handleDeleteAnswer}
-                      onAddComment={(body) => handleAddComment(answer.id, body)}
-                      onEditComment={(comment) => handleEditCommentClick(comment)}
-                      onDeleteComment={(commentId) => handleDeleteComment(answer.id, commentId)}
-                      onToggleComments={() => toggleComments(answer.id)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card className="bg-surface !rounded-2xl !text-white p-8 text-center mb-6">
-                  <div className="text-text-muted text-lg">
-                    No answers yet. Be the first to answer!
-                  </div>
-                </Card>
-              )}
+              <AnswerList
+                answers={answers}
+                isQuestionOwner={isQuestionOwner}
+                currentUserId={currentUserIdNum}
+                isAuthenticated={isAuthenticated}
+                commentsByAnswer={commentsByAnswer}
+                expandedComments={expandedComments}
+                onAccept={handleAcceptAnswer}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteAnswer}
+                onAddComment={handleAddComment}
+                onEditComment={handleEditCommentClick}
+                onDeleteComment={handleDeleteComment}
+                onToggleComments={toggleComments}
+              />
             </div>
           </div>
 
@@ -604,38 +589,15 @@ export default function QuestionDetail() {
         isSubmitting={updatingComment}
       />
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title={
-          <div className="flex items-center gap-3">
-            <DeleteOutlined className="text-error text-xl" />
-            <span>Confirm Delete</span>
-          </div>
-        }
+      <ConfirmDeleteModal
         open={isDeleteModalOpen}
-        onOk={handleConfirmDelete}
+        targetType={deleteTarget?.type || "question"}
+        onConfirm={handleConfirmDelete}
         onCancel={() => {
           setIsDeleteModalOpen(false);
           setDeleteTarget(null);
         }}
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-        centered
-        className="!text-white"
-      >
-        <div className="text-text-secondary py-4">
-          {deleteTarget?.type === 'question' && (
-            <p>Are you sure you want to delete this question? This action cannot be undone.</p>
-          )}
-          {deleteTarget?.type === 'answer' && (
-            <p>Are you sure you want to delete this answer? This action cannot be undone.</p>
-          )}
-          {deleteTarget?.type === 'comment' && (
-            <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
-          )}
-        </div>
-      </Modal>
+      />
     </div>
   );
 }

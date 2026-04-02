@@ -2,32 +2,29 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, Tag, Button, Pagination, Spin, App, Collapse } from "antd";
+import { Card, Tag, Button, Spin, App, Collapse, Avatar } from "antd";
 import {
   ThunderboltOutlined,
   MessageOutlined,
   UserOutlined,
   ClockCircleOutlined,
   PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
-import { Modal } from "antd";
 import { getQuestionFeed, updateQuestion, deleteQuestion, getPopularTags, getCommunityStats } from "@/api/question";
 import { Question, SortOption, FeedQueryParams, CreateQuestionRequest, TagStat, CommunityStats } from "@/types/question";
 import AskQuestionModal from "@/components/AskQuestionModal";
 import FilterToolbar from "@/components/FilterToolbar";
 import EditQuestionModal from "@/components/EditQuestionModal";
+import QuestionList from "@/components/Home/QuestionList";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
 import { fetchProfile } from "@/store/user/userThunks";
-import { Avatar } from "antd";
 
-const PAGE_SIZE = 5;
-const DEBOUNCE_DELAY = 500; // ms
+const DEBOUNCE_DELAY = 500;
 
 const faqs = [
   {
@@ -110,7 +107,6 @@ function HomePageContent() {
     const queryString = params.toString();
     const newPath = queryString ? `/home?${queryString}` : "/home";
     router.replace(newPath, { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, tag, sort]);
 
   const hasActiveFilters = search !== "" || tag !== "" || sort !== "newest";
@@ -174,7 +170,6 @@ function HomePageContent() {
     }, DEBOUNCE_DELAY);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, tag, sort]);
 
   useEffect(() => {
@@ -240,7 +235,6 @@ function HomePageContent() {
     setIsEditModalOpen(true);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdateQuestion = async (data: CreateQuestionRequest) => {
     if (!editingQuestion) return;
 
@@ -290,11 +284,7 @@ function HomePageContent() {
     );
   }
 
-  const totalPages = Math.ceil(questions.length / PAGE_SIZE);
-  const paginatedQuestions = questions.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const totalPages = Math.ceil(questions.length / 5);
 
   return (
     <AuthGuard>
@@ -303,7 +293,6 @@ function HomePageContent() {
         <div className="glow -bottom-60 -right-60 bg-accent/10" />
 
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          {/* Dashboard Welcome Header */}
           <header className="bg-surface !border-0 backdrop-blur-xl rounded-2xl px-8 py-5 flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Avatar
@@ -330,9 +319,7 @@ function HomePageContent() {
             </div>
           </header>
 
-          {/* Main Content */}
           <section className="grid md:grid-cols-3 gap-6">
-            {/* Left Column - Question List */}
             <div className="md:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-text-primary">All Questions</h2>
@@ -349,103 +336,19 @@ function HomePageContent() {
                 hasActiveFilters={hasActiveFilters}
               />
 
-              <div className="space-y-4">
-                {paginatedQuestions.map((q) => {
-                  const isOwner = currentUserId ? q.author.id === Number(currentUserId) : false;
-
-                  return (
-                    <Card
-                      key={q.id}
-                      className="glass !rounded-2xl !text-white hover:!border-accent transition cursor-pointer"
-                      onClick={() => handleQuestionClick(q.id)}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                          <div className="text-meta text-text-muted flex items-center gap-1">
-                            <ThunderboltOutlined className="text-yellow-400" />
-                            {q.vote_count}
-                          </div>
-                          <div className="text-meta text-text-muted flex items-center gap-1">
-                            <MessageOutlined />
-                            {q.answer_count}
-                          </div>
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-title text-text-primary hover:text-primary transition flex-1">
-                              {q.title}
-                            </h3>
-                            {isOwner && (
-                              <div className="flex gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                <Button
-                                  size="small"
-                                  icon={<EditOutlined />}
-                                  onClick={() => handleEditQuestion(q)}
-                                  className="!bg-selected-bg !border-accent/30 !text-text-primary hover:!bg-hover-bg"
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  size="small"
-                                  icon={<DeleteOutlined />}
-                                  onClick={() => handleDeleteQuestion(q.id)}
-                                  className="!bg-red-500/20 !border-red-400/30 !text-red-200 hover:!bg-red-500/30"
-                                >
-                                  Delete
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 mt-2 text-meta text-text-muted">
-                            <UserOutlined className="text-text-secondary" />
-                            <span>{q.author.username}</span>
-                            <span className="text-gray-200/30">•</span>
-                            <ClockCircleOutlined className="text-text-secondary" />
-                            <span>{formatDate(q.created_at)}</span>
-                          </div>
-
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {q.tags.map((tagItem) => (
-                              <Tag
-                                key={tagItem}
-                                className="!bg-hover-bg !border-border-soft !text-text-secondary"
-                              >
-                                {tagItem}
-                              </Tag>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {paginatedQuestions.length === 0 && !loading && (
-                <div className="glass !rounded-2xl !text-white p-8 text-center">
-                  <div className="text-text-muted text-base">
-                    {hasActiveFilters
-                      ? "No questions match your filters. Try adjusting your search."
-                      : "No questions yet. Be the first to ask!"}
-                  </div>
-                </div>
-              )}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <Pagination
-                    current={currentPage}
-                    total={questions.length}
-                    pageSize={PAGE_SIZE}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                    showLessItems
-                  />
-                </div>
-              )}
+              <QuestionList
+                questions={questions}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                currentUserId={currentUserId}
+                loading={loading}
+                hasActiveFilters={hasActiveFilters}
+                onPageChange={handlePageChange}
+                onQuestionClick={handleQuestionClick}
+                onEditQuestion={handleEditQuestion}
+                onDeleteQuestion={handleDeleteQuestion}
+                formatDate={formatDate}
+              />
             </div>
 
             {/* Right Column - Sidebar */}
@@ -550,29 +453,15 @@ function HomePageContent() {
         onSuccess={fetchQuestions}
       />
 
-      <Modal
-        title={
-          <div className="flex items-center gap-3">
-            <DeleteOutlined className="text-error text-xl" />
-            <span>Confirm Delete</span>
-          </div>
-        }
+      <ConfirmDeleteModal
         open={isDeleteModalOpen}
+        targetType="question"
+        onConfirm={handleConfirmDelete}
         onCancel={() => {
           setIsDeleteModalOpen(false);
           setDeleteTarget(null);
         }}
-        onOk={handleConfirmDelete}
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-        centered
-        className="!text-white"
-      >
-        <div className="text-text-secondary py-4">
-          <p>Are you sure you want to delete this question? This action cannot be undone.</p>
-        </div>
-      </Modal>
+      />
     </AuthGuard>
   );
 }
