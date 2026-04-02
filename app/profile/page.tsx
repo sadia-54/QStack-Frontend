@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Tabs, Form, Input, Button, message, Typography, Divider, Modal, Pagination, DatePicker, Avatar, Space, Card } from "antd";
-const { TextArea } = Input;
+import { Tabs, Form, Input, Button, message, Avatar, Space, Card, DatePicker } from "antd";
 import dayjs from "dayjs";
 import {
   UserOutlined,
@@ -16,16 +15,16 @@ import {
   QuestionCircleOutlined,
   LockOutlined,
   CameraOutlined,
-  UploadOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store";
 import AuthGuard from "@/components/AuthGuard";
 import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";
 import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
-import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab } from "@/components/Profile";
+import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/Profile";
 
 const { RangePicker } = DatePicker;
+const { TextArea } = Input;
 
 const PAGE_SIZE = 5;
 
@@ -41,7 +40,6 @@ export default function ProfilePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [passwordForm] = Form.useForm();
 
   useEffect(() => {
@@ -139,10 +137,6 @@ export default function ProfilePage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const handleQuestionClick = (id: number) => {
-    router.push(`/question/${id}`);
   };
 
   const handlePasswordChange = async (values: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
@@ -313,75 +307,22 @@ export default function ProfilePage() {
           />
         </div>
 
-        <Modal
-          title="Edit Profile"
+        <EditProfileModal
           open={isEditModalOpen}
-          onOk={handleSaveBio}
+          bio={bio}
+          isLoading={isLoading}
+          onBioChange={setBio}
+          onSave={handleSaveBio}
           onCancel={handleCancelBio}
-          className="glass-modal"
-          footer={[
-            <Button key="cancel" onClick={handleCancelBio} className="!text-text-secondary">
-              Cancel
-            </Button>,
-            <Button
-              key="save"
-              type="primary"
-              onClick={handleSaveBio}
-              className="btn-gradient"
-              loading={isLoading}
-            >
-              Save Changes
-            </Button>,
-          ]}
-        >
-          <Space direction="vertical" className="w-full mt-4">
-            <div>
-              <label className="text-text-secondary text-meta mb-2 block">Bio</label>
-              <TextArea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={4}
-                className="!bg-surface !text-text-primary !border hover:!border-accent focus:!border-accent"
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-          </Space>
-        </Modal>
+        />
 
-        <Modal
-          title="Upload Profile Image"
+        <UploadProfileImageModal
           open={isUploadModalOpen}
+          uploadingImage={uploadingImage}
           onCancel={() => setIsUploadModalOpen(false)}
-          className="glass-modal"
-          footer={null}
-        >
-          <div className="py-4">
-            <div className="text-center mb-4">
-              <UploadOutlined className="text-4xl text-primary mb-2" />
-              <p className="text-text-secondary">Select an image from your device</p>
-              <p className="text-meta text-text-muted mt-1">Supported formats: JPG, PNG, GIF (Max 5MB)</p>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              id="profile-image-upload-modal"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-              disabled={uploadingImage}
-            />
-            <Button
-              type="primary"
-              className="btn-gradient w-full"
-              icon={<UploadOutlined />}
-              loading={uploadingImage}
-              size="large"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {uploadingImage ? "Uploading..." : "Choose Image"}
-            </Button>
-          </div>
-        </Modal>
+          setUploadingImage={setUploadingImage}
+          setIsUploadModalOpen={setIsUploadModalOpen}
+        />
       </div>
     </AuthGuard>
   );
