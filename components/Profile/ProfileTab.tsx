@@ -78,7 +78,7 @@ export default function ProfileTab({ profile, onEditClick }: ProfileTabProps) {
       </div>
 
       {/* Preferred Tags */}
-      <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-primary/50 transition">
+      {/* <Card className="bg-surface !rounded-xl !border-border-soft hover:!border-primary/50 transition">
         <h3 className="text-title mb-4 text-text-primary">Preferred Tags</h3>
         {profile?.preferred_tags && profile.preferred_tags.length > 0 ? (
           <div className="flex flex-wrap gap-2">
@@ -94,7 +94,7 @@ export default function ProfileTab({ profile, onEditClick }: ProfileTabProps) {
         ) : (
           <p className="text-meta text-text-muted">No preferred tags set</p>
         )}
-      </Card>
+      </Card> */}
     </div>
   );
 }

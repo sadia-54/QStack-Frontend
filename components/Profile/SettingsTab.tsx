@@ -27,7 +27,7 @@ export default function SettingsTab({
   const [passwordForm] = Form.useForm();
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Change Password */}
       <Card className="bg-surface !rounded-xl !border-border-soft">
         <h3 className="text-lg font-semibold mb-4 text-text-primary flex items-center gap-2">
