@@ -80,13 +80,13 @@ export default function ActivityTab({ activities }: ActivityTabProps) {
   const [activityPage, setActivityPage] = useState(1);
 
   const filteredActivities = activityDateRange
-    ? activities.filter((item) => {
+    ? (activities || []).filter((item) => {
         const activityDate = new Date(item.created_at);
         const startDate = activityDateRange[0].toDate();
         const endDate = activityDateRange[1].endOf('day').toDate();
         return activityDate >= startDate && activityDate <= endDate;
       })
-    : activities;
+    : (activities || []);
 
   const sortedActivities = [...filteredActivities].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()

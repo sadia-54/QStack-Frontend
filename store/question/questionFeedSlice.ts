@@ -59,6 +59,11 @@ const questionFeedSlice = createSlice({
       .addCase(fetchMyFeed.fulfilled, (state, action) => {
         state.isLoading = false;
 
+        if (!action.payload || action.payload.length === 0) {
+          state.hasMore = false;
+          return;
+        }
+
         if (action.payload.length < state.limit) {
           state.hasMore = false;
         }
