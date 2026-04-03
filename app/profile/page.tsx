@@ -19,7 +19,7 @@ import { RootState, AppDispatch } from "@/store";
 import { AuthGuard } from "@/components/auth";
 import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";
 import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
-import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/Profile";
+import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/profile";
 
 
 export default function ProfilePage() {
