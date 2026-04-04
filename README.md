@@ -4,7 +4,7 @@
 
 A modern developer Q&A platform built with Next.js, enabling developers to ask technical questions, share knowledge, vote on content, build reputation, and maintain personalized feeds based on preferred tags.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-14.2.35-white?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?logo=tailwind-css)
