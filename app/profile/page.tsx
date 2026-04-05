@@ -1,26 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Tabs, Form, Button, message, Avatar, Card } from "antd";
-import {
-  UserOutlined,
-  MailOutlined,
-  EditOutlined,
-  ThunderboltOutlined,
-  MessageOutlined,
-  StarOutlined,
-  ClockCircleOutlined,
-  QuestionCircleOutlined,
-  LockOutlined,
-  CameraOutlined,
-} from "@ant-design/icons";
-import { RootState, AppDispatch } from "@/store";
 import { AuthGuard } from "@/components/auth";
-import { fetchProfile, updateUserProfile, fetchUserActivity, updateUserPassword, fetchUserEmail, uploadProfileImageThunk } from "@/store/user/userThunks";
+import { AppDispatch, RootState } from "@/store";
 import { fetchMyQuestions } from "@/store/question/myQuestionsSlice";
-import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/profile";
+import { fetchProfile, fetchUserActivity, fetchUserEmail, updateUserPassword, updateUserProfile, uploadProfileImageThunk } from "@/store/user/userThunks";
+import {
+  CameraOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  LockOutlined,
+  MailOutlined,
+  MessageOutlined,
+  QuestionCircleOutlined,
+  StarOutlined,
+  ThunderboltOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Avatar, Button, Card, Form, message, Tabs } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+// import { ProfileTab, ActivityTab, MyQuestionsTab, SettingsTab, EditProfileModal, UploadProfileImageModal } from "@/components/profile";
 
+import { ActivityTab, EditProfileModal, MyQuestionsTab, ProfileTab, SettingsTab, UploadProfileImageModal } from "@/components/Profile";
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
