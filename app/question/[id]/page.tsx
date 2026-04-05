@@ -1,42 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Card, Tag, Button, App } from "antd";
 import {
-  MessageOutlined,
-  UserOutlined,
-  ClockCircleOutlined,
-  ArrowLeftOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  UpOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
-import { getQuestionById, updateQuestion, deleteQuestion, voteQuestion } from "@/api/question";
-import { Question, CreateQuestionRequest } from "@/types/question";
-import { Answer } from "@/types/answer";
-import {
-  getAnswersByQuestion,
-  createAnswer,
-  updateAnswer,
-  deleteAnswer,
   acceptAnswer,
+  createAnswer,
+  deleteAnswer,
+  getAnswersByQuestion,
+  updateAnswer,
 } from "@/api/answer";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/store";
-import { setVote, removeVote } from "@/store/question/questionVoteSlice";
-import { AnswerList, AnswerForm, EditAnswerModal } from "@/components/answer";
-import EditQuestionModal from "@/components/question/EditQuestionModal";
-import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
-import { Comment } from "@/types/comment";
+import { deleteQuestion, getQuestionById, updateQuestion, voteQuestion } from "@/api/question";
+import { AppDispatch, RootState } from "@/store";
+import { removeVote, setVote } from "@/store/question/questionVoteSlice";
+import { Answer } from "@/types/answer";
+import { CreateQuestionRequest, Question } from "@/types/question";
 import {
-  getCommentsByAnswer,
+  ArrowLeftOutlined,
+  ClockCircleOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+  MessageOutlined,
+  UpOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { App, Button, Card, Tag } from "antd";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+// import { AnswerList, AnswerForm, EditAnswerModal } from "@/components/answer";
+import {
   createComment,
-  updateComment,
   deleteComment,
+  getCommentsByAnswer,
+  updateComment,
 } from "@/api/comment";
+import { AnswerForm, AnswerList, EditAnswerModal } from "@/components/Answer";
 import { EditCommentModal } from "@/components/comment";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
+import EditQuestionModal from "@/components/question/EditQuestionModal";
+import { Comment } from "@/types/comment";
 
 function useQuestionState() {
   const [question, setQuestion] = useState<Question | null>(null);
