@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   // Show nothing while initializing or if not authenticated
   if (isInitializing || !isAuthenticated) {
-    return null;
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
   return <>{children}</>;
